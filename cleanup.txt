@@ -1,0 +1,164 @@
+  /* ============================================================
+     PUBLIC API
+     ============================================================ */
+
+  function reset() {
+    startGame();
+  }
+
+  /* ============================================================
+     CLEANUP
+     ============================================================ */
+
+  function destroy() {
+    if (destroyed) {
+      return;
+    }
+
+    destroyed = true;
+
+    // Cancel animation frame if used.
+    if (animationFrame !== null) {
+      cancelAnimationFrame(
+        animationFrame
+      );
+
+      animationFrame = null;
+    }
+
+    // Remove ResizeObserver if used.
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    } else {
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+    }
+
+    // Remove window/document listeners here.
+    // Remove game-specific DOM listeners here.
+    // Clear timers / intervals here.
+    // Stop audio / animation / game state here.
+
+    /* ----------------------------------------------------------
+       GAME-SPECIFIC CLEANUP
+       ---------------------------------------------------------- */
+
+    // Example:
+    //
+    // window.removeEventListener(
+    //   "keydown",
+    //   handleKeyDown
+    // );
+    //
+    // button.removeEventListener(
+    //   "click",
+    //   handleClick
+    // );
+
+    /* ----------------------------------------------------------
+       RESET INPUT / COLLECTIONS
+       ---------------------------------------------------------- */
+
+    // Example:
+    //
+    // input.left = false;
+    // input.right = false;
+    //
+    // clearObstacles();
+  }
+
+  return {
+    reset,
+    destroy
+  };
+
+
+  ////////apps.js
+  //Then app.js can treat every game consistently:
+
+if (memory) {
+  memory.reset();
+}
+
+//and when leaving the game:
+
+if (memory) {
+  memory.destroy();
+  memory = null;
+}
+
+//fix ain 5 palces pp.js
+///Final Dodge integration like
+//The resulting relevant parts of app.js should therefore be:
+
+import { initTicTacToe } from "./initTicTacToe.js";
+import initRockPaperScissors from "./initRockPaperScissors.js";
+import initHigherLower from "./initHigherLower.js";
+import initMemory from "./initMemory.js";
+import initBrickBreaker from "./initBrickBreaker.js";
+import initDodge from "./initDodge.js";
+
+let ticTacToe = null;
+let rockPaperScissors = null;
+let higherLower = null;
+let memory = null;
+let brickBreaker = null;
+let dodge = null;
+
+    } else if (game.id === "dodge") {
+      dodge = initDodge(dom.gameStage, {
+        playTone,
+        vibrate
+      });
+
+      dom.gameScore.classList.remove("is-hidden");
+
+      dom.scoreLabelLeft.textContent = "Score";
+      dom.scoreLabelCenter.textContent = "Best";
+      dom.scoreLabelRight.textContent = "Time";
+
+      dom.scoreValueLeft.textContent = "0";
+      dom.scoreValueCenter.textContent = "0";
+      dom.scoreValueRight.textContent = "0s";
+
+    } else {
+      renderIntro(game);
+    }
+
+And:
+
+      /* ----------------------------------------------------------
+         DODGE
+         ---------------------------------------------------------- */
+
+      if (
+        state.activeGame.id ===
+        "dodge"
+      ) {
+        if (dodge) {
+          dodge.reset();
+        }
+
+        showToast(
+          "New Dodge game"
+        );
+
+        return;
+      }
+      
+      
+    and
+        const goHome = () => {
+
+    if (dodge) {
+      dodge.destroy();
+      dodge = null;
+    }
+
+    if (merge2048) {
+      merge2048.destroy();
+      merge2048 = null;
+    }
