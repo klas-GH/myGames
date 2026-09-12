@@ -16,8 +16,12 @@ export default function initHigherLower(root) {
         width: 100%;
         max-width: 680px;
         margin: 0 auto;
-        padding: 8px 0 18px;
+        padding: 6px 0 12px;
         box-sizing: border-box;
+
+        /* Prevent accidental horizontal overflow */
+        min-width: 0;
+        overflow: hidden;
       }
 
       .hl7-game *,
@@ -34,13 +38,18 @@ export default function initHigherLower(root) {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 18px;
+        gap: 12px;
+        margin-bottom: 13px;
+        min-width: 0;
+      }
+
+      .hl7-header > div:first-child {
+        min-width: 0;
       }
 
       .hl7-eyebrow {
         margin: 0 0 3px;
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 800;
         letter-spacing: 0.14em;
         text-transform: uppercase;
@@ -49,26 +58,31 @@ export default function initHigherLower(root) {
 
       .hl7-title {
         margin: 0;
-        font-size: clamp(1.6rem, 5vw, 2.25rem);
+        font-size: clamp(1.4rem, 5vw, 2.15rem);
         line-height: 1;
         letter-spacing: -0.045em;
       }
 
       .hl7-badge {
+        flex: 0 0 auto;
+
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        padding: 8px 11px;
+        gap: 6px;
+
+        padding: 7px 10px;
         border-radius: 999px;
+
         border: 1px solid rgba(255,255,255,0.09);
         background: rgba(255,255,255,0.045);
-        font-size: 0.78rem;
+
+        font-size: 0.74rem;
         font-weight: 800;
         white-space: nowrap;
       }
 
       .hl7-badge-icon {
-        font-size: 1rem;
+        font-size: 0.95rem;
       }
 
       /* --------------------------------------------------------
@@ -77,16 +91,17 @@ export default function initHigherLower(root) {
 
       .hl7-score {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 9px;
-        margin-bottom: 17px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
       }
 
       .hl7-score-box {
         min-width: 0;
-        padding: 10px 8px;
+        padding: 8px 6px;
         text-align: center;
-        border-radius: 15px;
+
+        border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.07);
         background: rgba(255,255,255,0.035);
       }
@@ -94,7 +109,8 @@ export default function initHigherLower(root) {
       .hl7-score-box span {
         display: block;
         margin-bottom: 3px;
-        font-size: 0.68rem;
+
+        font-size: 0.64rem;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -103,7 +119,7 @@ export default function initHigherLower(root) {
 
       .hl7-score-box strong {
         display: block;
-        font-size: 1.45rem;
+        font-size: 1.35rem;
         line-height: 1;
       }
 
@@ -116,13 +132,19 @@ export default function initHigherLower(root) {
          -------------------------------------------------------- */
 
       .hl7-result {
-        min-height: 43px;
+        min-height: 38px;
+
         display: grid;
         place-items: center;
-        padding: 5px 10px;
+
+        padding: 3px 8px;
+
         text-align: center;
-        font-size: clamp(0.92rem, 3vw, 1.05rem);
+        font-size: clamp(0.86rem, 3vw, 1.02rem);
         font-weight: 800;
+
+        line-height: 1.2;
+
         transition:
           color 160ms ease,
           transform 160ms ease;
@@ -152,28 +174,66 @@ export default function initHigherLower(root) {
 
       /* --------------------------------------------------------
          CARD STAGE
-         -------------------------------------------------------- */
+         --------------------------------------------------------
+
+         IMPORTANT:
+         The old version used a fixed card width on desktop.
+         Because the card has aspect-ratio: 0.69, that created
+         a very tall card and caused vertical overflow.
+
+         The new version sizes the card from HEIGHT first.
+         This makes short laptop/PC screens safe.
+      */
 
       .hl7-card-stage {
-        min-height: 330px;
+        min-height: 0;
+
         display: grid;
         place-items: center;
-        padding: 8px 0 20px;
+
+        padding: 3px 0 10px;
+
         perspective: 900px;
+
+        /* Never let the stage create a huge fixed vertical area */
+        overflow: visible;
       }
 
       .hl7-card {
         position: relative;
-        width: min(57vw, 235px);
-        min-width: 190px;
+
+        /*
+         * Height is now the primary responsive dimension.
+         *
+         * - smaller screens -> smaller card
+         * - tall screens -> larger card
+         * - never below 210px
+         * - never above 285px
+         */
+        height: clamp(
+          210px,
+          31vh,
+          285px
+        );
+
+        width: auto;
         aspect-ratio: 0.69;
-        border-radius: 25px;
+
+        min-width: 0;
+        max-width: calc(100% - 20px);
+
+        border-radius: clamp(
+          19px,
+          2.8vh,
+          25px
+        );
 
         display: flex;
         align-items: center;
         justify-content: center;
 
         color: #111827;
+
         background:
           linear-gradient(
             145deg,
@@ -182,8 +242,8 @@ export default function initHigherLower(root) {
           );
 
         box-shadow:
-          0 24px 55px rgba(0,0,0,0.27),
-          0 7px 18px rgba(0,0,0,0.15),
+          0 20px 45px rgba(0,0,0,0.25),
+          0 6px 16px rgba(0,0,0,0.14),
           inset 0 0 0 1px rgba(0,0,0,0.04);
 
         border: 1px solid rgba(255,255,255,0.8);
@@ -200,9 +260,11 @@ export default function initHigherLower(root) {
       .hl7-card::before {
         content: "";
         position: absolute;
-        inset: 9px;
+        inset: 8px;
+
         border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 18px;
+        border-radius: 15px;
+
         pointer-events: none;
       }
 
@@ -210,12 +272,14 @@ export default function initHigherLower(root) {
         content: "";
         position: absolute;
         inset: 0;
+
         background:
           linear-gradient(
             125deg,
             rgba(255,255,255,0.55),
             transparent 38%
           );
+
         pointer-events: none;
       }
 
@@ -244,23 +308,31 @@ export default function initHigherLower(root) {
       }
 
       .hl7-corner-top {
-        top: 21px;
-        left: 22px;
+        top: 17px;
+        left: 18px;
       }
 
       .hl7-corner-bottom {
-        right: 22px;
-        bottom: 21px;
+        right: 18px;
+        bottom: 17px;
         transform: rotate(180deg);
       }
 
       .hl7-corner-rank {
-        font-size: clamp(1.65rem, 6vw, 2rem);
+        font-size: clamp(
+          1.35rem,
+          4.5vh,
+          1.85rem
+        );
       }
 
       .hl7-corner-suit {
-        margin-top: 4px;
-        font-size: clamp(1.05rem, 4vw, 1.35rem);
+        margin-top: 3px;
+        font-size: clamp(
+          0.95rem,
+          3.2vh,
+          1.25rem
+        );
       }
 
       /* --------------------------------------------------------
@@ -274,7 +346,17 @@ export default function initHigherLower(root) {
         display: grid;
         place-items: center;
 
-        font-size: clamp(5.2rem, 20vw, 7.4rem);
+        /*
+         * Scale from card height rather than viewport width.
+         * This keeps the symbol proportional when the card
+         * shrinks on short screens.
+         */
+        font-size: clamp(
+          4.2rem,
+          11vh,
+          6.8rem
+        );
+
         line-height: 1;
         font-weight: 400;
 
@@ -299,7 +381,7 @@ export default function initHigherLower(root) {
         0% {
           opacity: 0.5;
           transform:
-            translateY(14px)
+            translateY(10px)
             scale(0.88)
             rotateY(15deg);
         }
@@ -307,7 +389,7 @@ export default function initHigherLower(root) {
         55% {
           opacity: 1;
           transform:
-            translateY(-6px)
+            translateY(-4px)
             scale(1.035)
             rotateY(-4deg);
         }
@@ -327,10 +409,16 @@ export default function initHigherLower(root) {
 
       .hl7-choices {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+        gap: 10px;
+
         width: 100%;
         max-width: 560px;
+
         margin: 0 auto;
       }
 
@@ -338,28 +426,36 @@ export default function initHigherLower(root) {
         appearance: none;
         border: 1px solid rgba(255,255,255,0.08);
 
-        min-height: 76px;
-        padding: 11px 12px;
+        min-height: 64px;
+        padding: 9px 10px;
 
-        border-radius: 19px;
+        border-radius: 17px;
 
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 9px;
+
+        gap: 8px;
+
+        min-width: 0;
 
         color: #fff;
         background: rgba(255,255,255,0.055);
 
         font: inherit;
-        font-size: 0.92rem;
+        font-size: clamp(
+          0.78rem,
+          2.5vw,
+          0.95rem
+        );
+
         font-weight: 950;
-        letter-spacing: 0.09em;
+        letter-spacing: 0.07em;
 
         cursor: pointer;
 
         box-shadow:
-          0 7px 18px rgba(0,0,0,0.12);
+          0 6px 16px rgba(0,0,0,0.11);
 
         transition:
           transform 140ms ease,
@@ -369,7 +465,9 @@ export default function initHigherLower(root) {
       }
 
       .hl7-choice-icon {
-        font-size: 1.45rem;
+        flex: 0 0 auto;
+
+        font-size: 1.3rem;
         line-height: 1;
       }
 
@@ -383,11 +481,13 @@ export default function initHigherLower(root) {
 
       .hl7-choice:hover:not(:disabled) {
         transform: translateY(-3px);
+
         background: color-mix(
           in srgb,
           var(--choice) 12%,
           transparent
         );
+
         border-color: color-mix(
           in srgb,
           var(--choice) 40%,
@@ -396,7 +496,9 @@ export default function initHigherLower(root) {
       }
 
       .hl7-choice:active:not(:disabled) {
-        transform: translateY(1px) scale(0.98);
+        transform:
+          translateY(1px)
+          scale(0.98);
       }
 
       .hl7-choice:disabled {
@@ -412,14 +514,22 @@ export default function initHigherLower(root) {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
-        margin-top: 18px;
+
+        gap: 10px;
+
+        margin-top: 12px;
+
+        min-width: 0;
       }
 
       .hl7-run-message {
-        font-size: 0.82rem;
+        min-width: 0;
+
+        font-size: 0.76rem;
         font-weight: 750;
         opacity: 0.62;
+
+        line-height: 1.2;
       }
 
       .hl7-reset {
@@ -427,13 +537,15 @@ export default function initHigherLower(root) {
         border: 0;
         border-radius: 999px;
 
-        padding: 9px 14px;
+        flex: 0 0 auto;
+
+        padding: 8px 12px;
 
         color: inherit;
         background: rgba(255,255,255,0.055);
 
         font: inherit;
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         font-weight: 800;
 
         cursor: pointer;
@@ -466,78 +578,229 @@ export default function initHigherLower(root) {
 
       [data-theme="light"] .hl7-card {
         box-shadow:
-          0 22px 45px rgba(31,41,55,0.16),
-          0 6px 15px rgba(31,41,55,0.09),
+          0 20px 40px rgba(31,41,55,0.15),
+          0 6px 14px rgba(31,41,55,0.08),
           inset 0 0 0 1px rgba(0,0,0,0.04);
       }
 
       /* --------------------------------------------------------
-         MOBILE
+         SMALL PHONES
          -------------------------------------------------------- */
 
       @media (max-width: 520px) {
         .hl7-game {
-          padding-top: 2px;
+          padding-top: 1px;
+          padding-bottom: 8px;
         }
 
         .hl7-header {
-          margin-bottom: 13px;
+          margin-bottom: 9px;
+          gap: 8px;
         }
 
         .hl7-title {
-          font-size: 1.55rem;
+          font-size: clamp(
+            1.3rem,
+            7vw,
+            1.55rem
+          );
         }
 
         .hl7-badge {
-          padding: 7px 9px;
-          font-size: 0.7rem;
+          padding: 6px 8px;
+          font-size: 0.66rem;
+        }
+
+        .hl7-score {
+          gap: 6px;
+          margin-bottom: 7px;
+        }
+
+        .hl7-score-box {
+          padding: 7px 5px;
+          border-radius: 12px;
+        }
+
+        .hl7-score-box span {
+          font-size: 0.59rem;
+        }
+
+        .hl7-score-box strong {
+          font-size: 1.2rem;
+        }
+
+        .hl7-result {
+          min-height: 34px;
+          font-size: 0.84rem;
         }
 
         .hl7-card-stage {
-          min-height: 305px;
+          padding: 1px 0 7px;
         }
 
         .hl7-card {
-          width: 210px;
-          min-width: 210px;
+          height: clamp(
+            190px,
+            31vh,
+            255px
+          );
+        }
+
+        .hl7-corner-top {
+          top: 14px;
+          left: 15px;
+        }
+
+        .hl7-corner-bottom {
+          right: 15px;
+          bottom: 14px;
         }
 
         .hl7-center {
-          font-size: 6.3rem;
+          font-size: clamp(
+            3.8rem,
+            11vh,
+            5.9rem
+          );
         }
 
         .hl7-choice {
-          min-height: 72px;
+          min-height: 58px;
+          padding: 8px 7px;
+          border-radius: 15px;
+        }
+
+        .hl7-choice-icon {
+          font-size: 1.15rem;
         }
 
         .hl7-footer {
           flex-direction: column;
+          justify-content: center;
           text-align: center;
+          margin-top: 9px;
+        }
+
+        .hl7-run-message {
+          width: 100%;
         }
 
         .hl7-reset {
           width: 100%;
+          max-width: 260px;
         }
       }
 
-      @media (min-width: 800px) {
+      /* --------------------------------------------------------
+         VERY SHORT PHONES / LANDSCAPE
+         -------------------------------------------------------- */
+
+      @media (max-height: 680px) {
+        .hl7-game {
+          padding-top: 0;
+          padding-bottom: 5px;
+        }
+
+        .hl7-header {
+          margin-bottom: 7px;
+        }
+
+        .hl7-score {
+          margin-bottom: 4px;
+        }
+
+        .hl7-result {
+          min-height: 30px;
+        }
+
         .hl7-card {
-          width: 250px;
+          height: clamp(
+            175px,
+            29vh,
+            225px
+          );
         }
 
         .hl7-card-stage {
-          min-height: 350px;
-        }
-
-        .hl7-center {
-          font-size: 7.5rem;
+          padding-top: 0;
+          padding-bottom: 5px;
         }
 
         .hl7-choice {
-          min-height: 82px;
-          font-size: 1rem;
+          min-height: 52px;
+        }
+
+        .hl7-footer {
+          margin-top: 7px;
         }
       }
+
+      /* --------------------------------------------------------
+         VERY SHORT DESKTOP / LAPTOP
+         -------------------------------------------------------- */
+
+      @media (min-width: 521px) and (max-height: 760px) {
+        .hl7-game {
+          padding-top: 2px;
+          padding-bottom: 6px;
+        }
+
+        .hl7-header {
+          margin-bottom: 8px;
+        }
+
+        .hl7-score {
+          margin-bottom: 5px;
+        }
+
+        .hl7-result {
+          min-height: 32px;
+        }
+
+        .hl7-card {
+          height: clamp(
+            185px,
+            28vh,
+            235px
+          );
+        }
+
+        .hl7-card-stage {
+          padding-top: 0;
+          padding-bottom: 6px;
+        }
+
+        .hl7-choice {
+          min-height: 58px;
+        }
+
+        .hl7-footer {
+          margin-top: 8px;
+        }
+      }
+
+      /* --------------------------------------------------------
+         TALLER DESKTOP
+         -------------------------------------------------------- */
+
+      @media (min-width: 800px) and (min-height: 761px) {
+        .hl7-card {
+          height: clamp(
+            230px,
+            31vh,
+            285px
+          );
+        }
+
+        .hl7-choice {
+          min-height: 70px;
+          font-size: 0.96rem;
+        }
+      }
+
+      /* --------------------------------------------------------
+         REDUCED MOTION
+         -------------------------------------------------------- */
 
       @media (prefers-reduced-motion: reduce) {
         .hl7-card,
