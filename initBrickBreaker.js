@@ -13,17 +13,20 @@ export default function initBrickBreaker(root, options = {}) {
   if (!document.getElementById(styleId)) {
     const style = document.createElement("style");
     style.id = styleId;
+
     style.textContent = `
       .brick-breaker-screen {
         --brick-accent:#fb7185;
-        --brick-accent-strong:#f43f5e;
         width:100%;
         max-width:760px;
+        min-width:0;
         margin:0 auto;
-        padding:8px 0 24px;
+        padding:clamp(3px,1vh,8px) 0
+          calc(10px + env(safe-area-inset-bottom,0px));
         color:inherit;
         user-select:none;
         -webkit-user-select:none;
+        overflow-x:hidden;
       }
 
       .brick-breaker-screen *,
@@ -37,13 +40,19 @@ export default function initBrickBreaker(root, options = {}) {
         align-items:center;
         justify-content:space-between;
         gap:12px;
-        margin-bottom:14px;
+        min-width:0;
+        margin-bottom:12px;
+      }
+
+      .brick-header > div:first-child {
+        min-width:0;
       }
 
       .brick-header h3 {
         margin:2px 0 0;
-        font-size:clamp(1.35rem,4vw,1.8rem);
+        font-size:clamp(1.25rem,4vw,1.8rem);
         line-height:1.1;
+        overflow-wrap:anywhere;
       }
 
       .brick-header .eyebrow {
@@ -54,6 +63,7 @@ export default function initBrickBreaker(root, options = {}) {
         display:inline-flex;
         align-items:center;
         gap:7px;
+        flex-shrink:0;
         padding:8px 12px;
         border-radius:999px;
         background:rgba(251,113,133,.12);
@@ -69,11 +79,12 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-game-wrap {
         position:relative;
-        width:100%;
-        max-width:620px;
+        width:min(100%,620px,48vh);
+        width:min(100%,620px,48svh);
+        aspect-ratio:360 / 550;
         margin:0 auto;
         overflow:hidden;
-        border-radius:26px;
+        border-radius:clamp(16px,4vw,26px);
         background:
           radial-gradient(
             circle at 50% 18%,
@@ -90,8 +101,7 @@ export default function initBrickBreaker(root, options = {}) {
       .brick-canvas {
         display:block;
         width:100%;
-        height:auto;
-        aspect-ratio:360 / 550;
+        height:100%;
         touch-action:none;
         cursor:none;
         -webkit-tap-highlight-color:transparent;
@@ -103,12 +113,13 @@ export default function initBrickBreaker(root, options = {}) {
         display:flex;
         align-items:center;
         justify-content:center;
-        padding:22px;
-        background:linear-gradient(
-          145deg,
-          rgba(15,23,42,.92),
-          rgba(49,46,129,.94)
-        );
+        padding:clamp(10px,3vw,22px);
+        background:
+          linear-gradient(
+            145deg,
+            rgba(15,23,42,.92),
+            rgba(49,46,129,.94)
+          );
         opacity:0;
         visibility:hidden;
         transition:opacity .24s ease,visibility .24s ease;
@@ -122,41 +133,48 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-overlay-card {
         width:min(100%,340px);
-        padding:26px 20px;
+        max-height:calc(100% - 12px);
+        overflow:auto;
+        padding:clamp(16px,4vw,26px)
+          clamp(13px,4vw,20px);
         text-align:center;
         border-radius:24px;
         background:rgba(255,255,255,.07);
         border:1px solid rgba(255,255,255,.13);
         box-shadow:0 22px 60px rgba(0,0,0,.30);
         color:#fff;
+        scrollbar-width:thin;
       }
 
       .brick-overlay-icon {
-        font-size:clamp(3rem,13vw,5rem);
+        font-size:clamp(2.5rem,13vw,5rem);
         line-height:1;
-        margin-bottom:10px;
+        margin-bottom:8px;
       }
 
       .brick-overlay h4 {
         margin:0 0 7px;
-        font-size:clamp(1.55rem,6vw,2.1rem);
+        font-size:clamp(1.4rem,6vw,2.1rem);
+        line-height:1.05;
       }
 
       .brick-overlay p {
-        margin:0 0 17px;
-        font-size:.88rem;
+        margin:0 0 14px;
+        font-size:.84rem;
+        line-height:1.35;
         opacity:.76;
       }
 
       .brick-overlay-stats {
         display:grid;
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(2,minmax(0,1fr));
         gap:8px;
-        margin-bottom:18px;
+        margin-bottom:15px;
       }
 
       .brick-overlay-stat {
-        padding:10px;
+        min-width:0;
+        padding:9px;
         border-radius:13px;
         background:rgba(255,255,255,.07);
         border:1px solid rgba(255,255,255,.09);
@@ -164,7 +182,7 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-overlay-stat span {
         display:block;
-        font-size:.62rem;
+        font-size:.60rem;
         font-weight:800;
         letter-spacing:.08em;
         text-transform:uppercase;
@@ -174,14 +192,14 @@ export default function initBrickBreaker(root, options = {}) {
       .brick-overlay-stat strong {
         display:block;
         margin-top:3px;
-        font-size:1.1rem;
+        font-size:1.05rem;
       }
 
       .brick-overlay-button {
         appearance:none;
         border:0;
         min-height:44px;
-        padding:10px 22px;
+        padding:9px 20px;
         border-radius:999px;
         background:var(--brick-accent);
         color:#fff;
@@ -201,10 +219,12 @@ export default function initBrickBreaker(root, options = {}) {
       }
 
       .brick-message {
-        min-height:24px;
-        margin:12px 0 0;
+        min-height:21px;
+        margin:8px 0 0;
+        padding:0 4px;
         text-align:center;
-        font-size:.84rem;
+        font-size:.82rem;
+        line-height:1.25;
         font-weight:750;
         opacity:.72;
       }
@@ -213,14 +233,18 @@ export default function initBrickBreaker(root, options = {}) {
         display:flex;
         align-items:center;
         justify-content:space-between;
-        gap:12px;
-        margin-top:12px;
+        gap:10px;
+        min-width:0;
+        margin-top:8px;
       }
 
       .brick-footer-message {
-        font-size:.78rem;
+        min-width:0;
+        font-size:.76rem;
+        line-height:1.2;
         font-weight:700;
         opacity:.60;
+        overflow-wrap:anywhere;
       }
 
       .brick-new-game {
@@ -234,7 +258,7 @@ export default function initBrickBreaker(root, options = {}) {
         }
 
         .brick-header {
-          margin-bottom:11px;
+          margin-bottom:9px;
         }
 
         .brick-status {
@@ -245,16 +269,81 @@ export default function initBrickBreaker(root, options = {}) {
           display:none;
         }
 
+        .brick-message {
+          margin-top:6px;
+          font-size:.78rem;
+        }
+      }
+
+      @media (max-height:720px) {
         .brick-game-wrap {
-          border-radius:22px;
+          width:min(100%,620px,44vh);
+          width:min(100%,620px,44svh);
+        }
+
+        .brick-header {
+          margin-bottom:7px;
         }
 
         .brick-message {
-          margin-top:9px;
+          min-height:19px;
+          margin-top:5px;
         }
 
         .brick-footer {
-          align-items:flex-start;
+          margin-top:5px;
+        }
+      }
+
+      @media (max-height:560px) {
+        .brick-header {
+          margin-bottom:5px;
+        }
+
+        .brick-header h3 {
+          font-size:1.15rem;
+        }
+
+        .brick-header .eyebrow {
+          font-size:.62rem;
+        }
+
+        .brick-game-wrap {
+          width:min(100%,620px,40vh);
+          width:min(100%,620px,40svh);
+        }
+
+        .brick-message {
+          min-height:17px;
+          margin-top:4px;
+          font-size:.72rem;
+        }
+
+        .brick-footer {
+          margin-top:4px;
+        }
+
+        .brick-footer-message {
+          font-size:.68rem;
+        }
+      }
+
+      @media (max-width:360px) {
+        .brick-footer {
+          gap:7px;
+        }
+
+        .brick-footer-message {
+          font-size:.68rem;
+        }
+
+        .brick-overlay-card {
+          border-radius:18px;
+        }
+
+        .brick-overlay-stats {
+          gap:6px;
+          margin-bottom:10px;
         }
       }
 
@@ -275,7 +364,6 @@ export default function initBrickBreaker(root, options = {}) {
 
   root.innerHTML = `
     <section data-game="brick-breaker" class="brick-breaker-screen">
-
       <div class="brick-header">
         <div>
           <p class="eyebrow">Game</p>
@@ -301,7 +389,6 @@ export default function initBrickBreaker(root, options = {}) {
           aria-live="polite"
         >
           <div class="brick-overlay-card">
-
             <div
               class="brick-overlay-icon"
               data-brick-overlay-icon
@@ -333,7 +420,6 @@ export default function initBrickBreaker(root, options = {}) {
             >
               Play Again
             </button>
-
           </div>
         </div>
       </div>
@@ -359,7 +445,6 @@ export default function initBrickBreaker(root, options = {}) {
           New Game
         </button>
       </div>
-
     </section>
   `;
 
@@ -397,7 +482,6 @@ export default function initBrickBreaker(root, options = {}) {
   const H = 550;
 
   const BEST_SCORE_KEY = "miniArcade.brickBreaker.best";
-
   const STARTING_LIVES = 3;
   const BASE_BALL_SPEED = 205;
   const MAX_BALL_SPEED = 330;
@@ -437,6 +521,7 @@ export default function initBrickBreaker(root, options = {}) {
   let lastFrameTime = 0;
   let transitionTimer = 0;
   let gameVersion = 0;
+  let resizeObserver = null;
 
   const paddle = {
     x: (W - PADDLE_WIDTH) / 2,
@@ -458,7 +543,7 @@ export default function initBrickBreaker(root, options = {}) {
   };
 
   /* ============================================================
-     STORAGE
+     STORAGE / UI
      ============================================================ */
 
   function readBestScore() {
@@ -466,10 +551,7 @@ export default function initBrickBreaker(root, options = {}) {
       const value = Number(
         localStorage.getItem(BEST_SCORE_KEY)
       );
-
-      return Number.isFinite(value)
-        ? Math.max(0, value)
-        : 0;
+      return Number.isFinite(value) ? Math.max(0, value) : 0;
     } catch {
       return 0;
     }
@@ -481,16 +563,9 @@ export default function initBrickBreaker(root, options = {}) {
     bestScore = score;
 
     try {
-      localStorage.setItem(
-        BEST_SCORE_KEY,
-        String(bestScore)
-      );
+      localStorage.setItem(BEST_SCORE_KEY, String(bestScore));
     } catch {}
   }
-
-  /* ============================================================
-     UI
-     ============================================================ */
 
   function updateScoreUI() {
     if (scoreValueLeft) scoreValueLeft.textContent = score;
@@ -511,10 +586,9 @@ export default function initBrickBreaker(root, options = {}) {
   }
 
   function clearTransition() {
-    if (transitionTimer) {
-      clearTimeout(transitionTimer);
-      transitionTimer = 0;
-    }
+    if (!transitionTimer) return;
+    clearTimeout(transitionTimer);
+    transitionTimer = 0;
   }
 
   function schedule(callback, delay, version) {
@@ -523,12 +597,7 @@ export default function initBrickBreaker(root, options = {}) {
     transitionTimer = window.setTimeout(() => {
       transitionTimer = 0;
 
-      if (
-        destroyed ||
-        version !== gameVersion
-      ) {
-        return;
-      }
+      if (destroyed || version !== gameVersion) return;
 
       callback();
     }, delay);
@@ -541,17 +610,9 @@ export default function initBrickBreaker(root, options = {}) {
   function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
 
-    const width = Math.max(
-      280,
-      rect.width || W
-    );
-
-    const height = width * H / W;
-
-    const dpr = Math.min(
-      window.devicePixelRatio || 1,
-      2
-    );
+    const width = Math.max(1, rect.width || W);
+    const height = Math.max(1, rect.height || width * H / W);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -573,14 +634,10 @@ export default function initBrickBreaker(root, options = {}) {
   function buildLevel() {
     bricks = [];
 
-    const availableWidth =
-      W - BRICK_SIDE_MARGIN * 2;
-
+    const availableWidth = W - BRICK_SIDE_MARGIN * 2;
     const brickWidth =
-      (
-        availableWidth -
-        BRICK_GAP * (BRICK_COLUMNS - 1)
-      ) / BRICK_COLUMNS;
+      (availableWidth - BRICK_GAP * (BRICK_COLUMNS - 1)) /
+      BRICK_COLUMNS;
 
     const colors = [
       "#fb7185",
@@ -607,11 +664,9 @@ export default function initBrickBreaker(root, options = {}) {
 
           width: brickWidth,
           height: BRICK_HEIGHT,
-
           color,
           colorDark: shadeColor(color, -22),
           glow: color,
-
           points: 10,
           alive: true
         });
@@ -620,8 +675,7 @@ export default function initBrickBreaker(root, options = {}) {
       bricks.push(brickRow);
     }
 
-    bricksRemaining =
-      BRICK_ROWS * BRICK_COLUMNS;
+    bricksRemaining = BRICK_ROWS * BRICK_COLUMNS;
   }
 
   /* ============================================================
@@ -637,10 +691,7 @@ export default function initBrickBreaker(root, options = {}) {
   function clampPaddle() {
     paddle.x = Math.max(
       0,
-      Math.min(
-        W - paddle.width,
-        paddle.x
-      )
+      Math.min(W - paddle.width, paddle.x)
     );
   }
 
@@ -664,8 +715,7 @@ export default function initBrickBreaker(root, options = {}) {
       MAX_BALL_SPEED
     );
 
-    const angle =
-      Math.random() * 0.8 - 0.4;
+    const angle = Math.random() * 0.8 - 0.4;
 
     ball.vx = Math.sin(angle) * speed;
     ball.vy = -Math.cos(angle) * speed;
@@ -680,19 +730,10 @@ export default function initBrickBreaker(root, options = {}) {
   function increaseBallSpeed(amount = 2) {
     const current = currentBallSpeed();
 
-    if (
-      current <= 0 ||
-      current >= MAX_BALL_SPEED
-    ) {
-      return;
-    }
+    if (current <= 0 || current >= MAX_BALL_SPEED) return;
 
-    const next = Math.min(
-      MAX_BALL_SPEED,
-      current + amount
-    );
-
-    const ratio = next / current;
+    const ratio =
+      Math.min(MAX_BALL_SPEED, current + amount) / current;
 
     ball.vx *= ratio;
     ball.vy *= ratio;
@@ -703,13 +744,8 @@ export default function initBrickBreaker(root, options = {}) {
      ============================================================ */
 
   function shadeColor(color, amount) {
-    const num = parseInt(
-      color.replace("#", ""),
-      16
-    );
-
-    const clamp = value =>
-      Math.max(0, Math.min(255, value));
+    const num = parseInt(color.replace("#", ""), 16);
+    const clamp = value => Math.max(0, Math.min(255, value));
 
     const r = clamp((num >> 16) + amount);
     const g = clamp(((num >> 8) & 255) + amount);
@@ -723,77 +759,34 @@ export default function initBrickBreaker(root, options = {}) {
     );
   }
 
-  function roundedRectPath(
-    context,
-    x,
-    y,
-    width,
-    height,
-    radius
-  ) {
-    const r = Math.min(
-      radius,
-      width / 2,
-      height / 2
-    );
+  function roundedRectPath(context, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
 
     context.beginPath();
     context.moveTo(x + r, y);
-    context.arcTo(
-      x + width,
-      y,
-      x + width,
-      y + height,
-      r
-    );
-    context.arcTo(
-      x + width,
-      y + height,
-      x,
-      y + height,
-      r
-    );
-    context.arcTo(
-      x,
-      y + height,
-      x,
-      y,
-      r
-    );
-    context.arcTo(
-      x,
-      y,
-      x + width,
-      y,
-      r
-    );
+    context.arcTo(x + width, y, x + width, y + height, r);
+    context.arcTo(x + width, y + height, x, y + height, r);
+    context.arcTo(x, y + height, x, y, r);
+    context.arcTo(x, y, x + width, y, r);
     context.closePath();
   }
 
   function circleIntersectsRect(circle, rect) {
     const x = Math.max(
       rect.x,
-      Math.min(
-        circle.x,
-        rect.x + rect.width
-      )
+      Math.min(circle.x, rect.x + rect.width)
     );
 
     const y = Math.max(
       rect.y,
-      Math.min(
-        circle.y,
-        rect.y + rect.height
-      )
+      Math.min(circle.y, rect.y + rect.height)
     );
 
     const dx = circle.x - x;
     const dy = circle.y - y;
 
-    return (
-      dx * dx + dy * dy <=
-      circle.radius * circle.radius
-    );
+    return dx * dx + dy * dy <=
+      circle.radius * circle.radius;
   }
 
   /* ============================================================
@@ -801,12 +794,7 @@ export default function initBrickBreaker(root, options = {}) {
      ============================================================ */
 
   function drawBackground() {
-    const gradient = ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      H
-    );
+    const gradient = ctx.createLinearGradient(0, 0, 0, H);
 
     gradient.addColorStop(0, "#17152b");
     gradient.addColorStop(.55, "#111827");
@@ -816,10 +804,7 @@ export default function initBrickBreaker(root, options = {}) {
     ctx.fillRect(0, 0, W, H);
 
     ctx.save();
-
-    ctx.strokeStyle =
-      "rgba(255,255,255,.035)";
-
+    ctx.strokeStyle = "rgba(255,255,255,.035)";
     ctx.lineWidth = 1;
 
     for (let x = 0; x <= W; x += 30) {
@@ -847,15 +832,8 @@ export default function initBrickBreaker(root, options = {}) {
       230
     );
 
-    glow.addColorStop(
-      0,
-      "rgba(251,113,133,.12)"
-    );
-
-    glow.addColorStop(
-      1,
-      "rgba(251,113,133,0)"
-    );
+    glow.addColorStop(0, "rgba(251,113,133,.12)");
+    glow.addColorStop(1, "rgba(251,113,133,0)");
 
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, 300);
@@ -894,8 +872,7 @@ export default function initBrickBreaker(root, options = {}) {
         ctx.fill();
 
         ctx.shadowBlur = 0;
-        ctx.strokeStyle =
-          "rgba(255,255,255,.18)";
+        ctx.strokeStyle = "rgba(255,255,255,.18)";
         ctx.lineWidth = 1;
 
         roundedRectPath(
@@ -916,11 +893,8 @@ export default function initBrickBreaker(root, options = {}) {
   function drawPaddle() {
     const flash = paddle.hitFlash > 0;
 
-    if (paddle.hitFlash > 0) {
-      paddle.hitFlash = Math.max(
-        0,
-        paddle.hitFlash - .06
-      );
+    if (flash) {
+      paddle.hitFlash = Math.max(0, paddle.hitFlash - .06);
     }
 
     ctx.save();
@@ -956,8 +930,7 @@ export default function initBrickBreaker(root, options = {}) {
     ctx.fill();
 
     ctx.shadowBlur = 0;
-    ctx.fillStyle =
-      "rgba(255,255,255,.42)";
+    ctx.fillStyle = "rgba(255,255,255,.42)";
 
     roundedRectPath(
       ctx,
@@ -1009,20 +982,12 @@ export default function initBrickBreaker(root, options = {}) {
   function drawLevelIndicator() {
     ctx.save();
 
-    ctx.fillStyle =
-      "rgba(255,255,255,.50)";
-
-    ctx.font =
-      "700 10px system-ui,sans-serif";
-
+    ctx.fillStyle = "rgba(255,255,255,.50)";
+    ctx.font = "700 10px system-ui,sans-serif";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
 
-    ctx.fillText(
-      `LEVEL ${level}`,
-      W - 14,
-      15
-    );
+    ctx.fillText(`LEVEL ${level}`, W - 14, 15);
 
     ctx.restore();
   }
@@ -1031,17 +996,14 @@ export default function initBrickBreaker(root, options = {}) {
     if (gameOver) return;
 
     const alpha =
-      .50 +
-      Math.sin(performance.now() / 320) * .15;
+      .50 + Math.sin(performance.now() / 320) * .15;
 
     ctx.save();
 
     ctx.fillStyle =
       `rgba(255,255,255,${alpha})`;
 
-    ctx.font =
-      "700 12px system-ui,sans-serif";
-
+    ctx.font = "700 12px system-ui,sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -1066,9 +1028,6 @@ export default function initBrickBreaker(root, options = {}) {
     if (ball.waiting && !gameOver) {
       drawLaunchHint();
     }
-
-    // Game-over UI is the HTML overlay.
-    // No drawGameOver() call here.
   }
 
   /* ============================================================
@@ -1077,55 +1036,30 @@ export default function initBrickBreaker(root, options = {}) {
 
   function handlePaddleCollision() {
     if (ball.vy <= 0) return;
+    if (!circleIntersectsRect(ball, paddle)) return;
 
-    if (!circleIntersectsRect(ball, paddle)) {
-      return;
-    }
+    ball.y = paddle.y - ball.radius - 1;
 
-    ball.y =
-      paddle.y -
-      ball.radius -
-      1;
-
-    const center =
-      paddle.x +
-      paddle.width / 2;
-
-    const hit =
-      (ball.x - center) /
-      (paddle.width / 2);
-
-    const clamped = Math.max(
-      -1,
-      Math.min(1, hit)
-    );
+    const center = paddle.x + paddle.width / 2;
+    const hit = (ball.x - center) / (paddle.width / 2);
+    const clamped = Math.max(-1, Math.min(1, hit));
 
     const speed = Math.min(
       currentBallSpeed() + 2,
       MAX_BALL_SPEED
     );
 
-    const angle =
-      clamped * Math.PI * .70;
+    const angle = clamped * Math.PI * .70;
 
-    ball.vx =
-      Math.sin(angle) * speed;
-
-    ball.vy =
-      -Math.abs(
-        Math.cos(angle) * speed
-      );
+    ball.vx = Math.sin(angle) * speed;
+    ball.vy = -Math.abs(Math.cos(angle) * speed);
 
     paddle.hitFlash = 1;
 
     playTone(680);
   }
 
-  function resolveBrickBounce(
-    brick,
-    previousX,
-    previousY
-  ) {
+  function resolveBrickBounce(brick, previousX, previousY) {
     const above =
       previousY + ball.radius <= brick.y;
 
@@ -1163,10 +1097,7 @@ export default function initBrickBreaker(root, options = {}) {
     ball.vy *= -1;
   }
 
-  function checkBrickCollisions(
-    previousX,
-    previousY
-  ) {
+  function checkBrickCollisions(previousX, previousY) {
     for (const row of bricks) {
       for (const brick of row) {
         if (
@@ -1204,10 +1135,7 @@ export default function initBrickBreaker(root, options = {}) {
           `Level ${level} · ${bricksRemaining} bricks left`
         );
 
-        playTone(
-          560 + Math.min(320, score * 2)
-        );
-
+        playTone(560 + Math.min(320, score * 2));
         vibrate(6);
 
         if (bricksRemaining <= 0) {
@@ -1245,9 +1173,7 @@ export default function initBrickBreaker(root, options = {}) {
       `Level ${level} cleared! +${bonus} bonus 🎉`
     );
 
-    updateFooter(
-      "Preparing the next wall..."
-    );
+    updateFooter("Preparing the next wall...");
 
     level++;
 
@@ -1257,23 +1183,18 @@ export default function initBrickBreaker(root, options = {}) {
 
     schedule(() => {
       buildLevel();
-
       updateScoreUI();
 
       updateMessage(
         `Level ${level} · Clear the wall!`
       );
 
-      updateFooter(
-        "New wall, faster ball 🚀"
-      );
+      updateFooter("New wall, faster ball 🚀");
 
       draw();
 
       schedule(() => {
-        if (!gameOver) {
-          launchBall();
-        }
+        if (!gameOver) launchBall();
       }, 550, version);
     }, 500, version);
   }
@@ -1313,10 +1234,7 @@ export default function initBrickBreaker(root, options = {}) {
 
     schedule(() => {
       if (!gameOver) {
-        updateMessage(
-          "Tap the game area to launch"
-        );
-
+        updateMessage("Tap the game area to launch");
         launchBall();
       }
     }, 650, version);
@@ -1369,7 +1287,6 @@ export default function initBrickBreaker(root, options = {}) {
     gameOver = false;
     ballLaunched = false;
     ball.waiting = true;
-
     lastFrameTime = 0;
 
     overlay.classList.remove("is-visible");
@@ -1380,11 +1297,7 @@ export default function initBrickBreaker(root, options = {}) {
     resetBall(-1);
 
     updateScoreUI();
-
-    updateMessage(
-      "Tap the game area to launch"
-    );
-
+    updateMessage("Tap the game area to launch");
     updateFooter("Clear the wall 🧱");
 
     draw();
@@ -1401,38 +1314,25 @@ export default function initBrickBreaker(root, options = {}) {
   function updatePaddleFromPointer(clientX) {
     if (gameOver) return;
 
-    const rect =
-      canvas.getBoundingClientRect();
-
+    const rect = canvas.getBoundingClientRect();
     if (!rect.width) return;
 
     paddle.x =
-      (
-        (clientX - rect.left) /
-        rect.width
-      ) * W -
+      ((clientX - rect.left) / rect.width) * W -
       paddle.width / 2;
 
     clampPaddle();
 
     if (ball.waiting) {
-      ball.x =
-        paddle.x +
-        paddle.width / 2;
-
-      ball.y =
-        paddle.y -
-        ball.radius -
-        3;
+      ball.x = paddle.x + paddle.width / 2;
+      ball.y = paddle.y - ball.radius - 3;
     }
 
     draw();
   }
 
   function handlePointerMove(event) {
-    updatePaddleFromPointer(
-      event.clientX
-    );
+    updatePaddleFromPointer(event.clientX);
   }
 
   function handlePointerDown(event) {
@@ -1445,9 +1345,7 @@ export default function initBrickBreaker(root, options = {}) {
 
     event.preventDefault();
 
-    updatePaddleFromPointer(
-      event.clientX
-    );
+    updatePaddleFromPointer(event.clientX);
 
     if (ball.waiting && !gameOver) {
       launchBall();
@@ -1465,8 +1363,6 @@ export default function initBrickBreaker(root, options = {}) {
     handlePointerDown,
     { passive: false }
   );
-
-  canvas.style.touchAction = "none";
 
   /* ============================================================
      KEYBOARD INPUT
@@ -1486,9 +1382,7 @@ export default function initBrickBreaker(root, options = {}) {
       clampPaddle();
 
       if (ball.waiting) {
-        ball.x =
-          paddle.x +
-          paddle.width / 2;
+        ball.x = paddle.x + paddle.width / 2;
       }
 
       draw();
@@ -1506,19 +1400,14 @@ export default function initBrickBreaker(root, options = {}) {
       clampPaddle();
 
       if (ball.waiting) {
-        ball.x =
-          paddle.x +
-          paddle.width / 2;
+        ball.x = paddle.x + paddle.width / 2;
       }
 
       draw();
       return;
     }
 
-    if (
-      event.key === " " ||
-      event.key === "Enter"
-    ) {
+    if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
 
       if (ball.waiting) {
@@ -1527,10 +1416,7 @@ export default function initBrickBreaker(root, options = {}) {
     }
   }
 
-  window.addEventListener(
-    "keydown",
-    handleKeyDown
-  );
+  window.addEventListener("keydown", handleKeyDown);
 
   /* ============================================================
      UPDATE
@@ -1572,16 +1458,10 @@ export default function initBrickBreaker(root, options = {}) {
     handlePaddleCollision();
 
     if (!gameOver) {
-      checkBrickCollisions(
-        previousX,
-        previousY
-      );
+      checkBrickCollisions(previousX, previousY);
     }
 
-    if (
-      ball.y - ball.radius > H &&
-      !gameOver
-    ) {
+    if (ball.y - ball.radius > H && !gameOver) {
       loseLife();
     }
   }
@@ -1608,13 +1488,11 @@ export default function initBrickBreaker(root, options = {}) {
     draw();
 
     animationFrame =
-      window.requestAnimationFrame(
-        gameLoop
-      );
+      window.requestAnimationFrame(gameLoop);
   }
 
   /* ============================================================
-     RESIZE
+     RESIZE / VIEW CHANGES
      ============================================================ */
 
   function handleResize() {
@@ -1622,14 +1500,8 @@ export default function initBrickBreaker(root, options = {}) {
     clampPaddle();
 
     if (ball.waiting) {
-      ball.x =
-        paddle.x +
-        paddle.width / 2;
-
-      ball.y =
-        paddle.y -
-        ball.radius -
-        3;
+      ball.x = paddle.x + paddle.width / 2;
+      ball.y = paddle.y - ball.radius - 3;
     }
 
     draw();
@@ -1640,6 +1512,21 @@ export default function initBrickBreaker(root, options = {}) {
     handleResize,
     { passive: true }
   );
+
+  /*
+   * Important for SPA/game-view switching:
+   * if the game starts while its container is hidden,
+   * ResizeObserver fixes the canvas when the view becomes visible.
+   */
+  if ("ResizeObserver" in window) {
+    resizeObserver = new ResizeObserver(() => {
+      if (!destroyed) handleResize();
+    });
+
+    resizeObserver.observe(
+      root.querySelector(".brick-game-wrap")
+    );
+  }
 
   /* ============================================================
      CLEANUP
@@ -1654,6 +1541,11 @@ export default function initBrickBreaker(root, options = {}) {
     if (animationFrame) {
       cancelAnimationFrame(animationFrame);
       animationFrame = 0;
+    }
+
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
     }
 
     canvas.removeEventListener(
@@ -1691,22 +1583,13 @@ export default function initBrickBreaker(root, options = {}) {
      INITIALIZE
      ============================================================ */
 
-  resetButton.addEventListener(
-    "click",
-    reset
-  );
-
-  overlayRestart.addEventListener(
-    "click",
-    reset
-  );
+  resetButton.addEventListener("click", reset);
+  overlayRestart.addEventListener("click", reset);
 
   startGame();
 
   animationFrame =
-    window.requestAnimationFrame(
-      gameLoop
-    );
+    window.requestAnimationFrame(gameLoop);
 
   return {
     reset,
