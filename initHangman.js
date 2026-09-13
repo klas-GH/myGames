@@ -414,6 +414,11 @@ export default function initHangman(root, options = {}) {
         transform: scale(0.97);
       }
 
+      .hangman-action[data-back] {
+        display: none !important;
+      }
+
+
       /* ========================================================
          OVERLAY
          ======================================================== */
