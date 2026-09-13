@@ -2,5 +2,5 @@ so we need to fix an mini app on my app w 8 mini apps acoording to 1 exmaple tha
 -so i'll send/past the workin exampale 
 -the we fix allrest 4 modules //ok?
 ====
-Here’s the compact/fixed #3 version. The game logic, keyboard controls, swipe controls, scoring, best score, overlay, reset(), and destroy() API are preserved; the main changes are tighter sizing, viewport-aware dimensions, reduced gaps/padding, and better mobile containment.// ok resent  it got interrupred /broken redo
+Here’s the compact/fixed #3 version. The game logic, keyboard controls, swipe controls, scoring, best score, overlay, reset(), and destroy() API are preserved; the main changes are tighter sizing, viewport-aware dimensions, reduced gaps/padding, and better mobile containment, and make a more compact fixed version to be send.// ok resent  it got interrupred /broken redo
 ===
