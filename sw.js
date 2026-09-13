@@ -1,4 +1,4 @@
-const CACHE_NAME = "myGames-v1";
+const CACHE_NAME = "myGames-v2";
 
 const APP_SHELL = [
   "./",
@@ -43,13 +43,44 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET")
+  if (event.request.method !== "GET") {
     return;
+  }
 
+  const url = new URL(event.request.url);
+
+  // Always try the network first for the main HTML.
+  if (
+    event.request.destination === "document" ||
+    url.pathname.endsWith("/index.html")
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+
+    return;
+  }
+
+  // Cache-first for CSS, JS, icons, etc.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse)
+      if (cachedResponse) {
         return cachedResponse;
+      }
 
       return fetch(event.request).then((response) => {
         if (
