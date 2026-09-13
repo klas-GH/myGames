@@ -26,7 +26,7 @@ export default function initBrickBreaker(root, options = {}) {
         color:inherit;
         user-select:none;
         -webkit-user-select:none;
-        overflow-x:hidden;
+        overflow:hidden;
       }
 
       .brick-breaker-screen *,
@@ -79,8 +79,11 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-game-wrap {
         position:relative;
-        width:min(100%,620px,48vh);
-        width:min(100%,620px,48svh);
+        width:min(100%,620px);
+        height:min(
+          48svh,
+          calc(100svh - 230px)
+        );
         aspect-ratio:360 / 550;
         margin:0 auto;
         overflow:hidden;
@@ -97,6 +100,7 @@ export default function initBrickBreaker(root, options = {}) {
           0 22px 60px rgba(0,0,0,.20),
           inset 0 1px 0 rgba(255,255,255,.07);
       }
+
 
       .brick-canvas {
         display:block;
@@ -277,8 +281,11 @@ export default function initBrickBreaker(root, options = {}) {
 
       @media (max-height:720px) {
         .brick-game-wrap {
-          width:min(100%,620px,44vh);
-          width:min(100%,620px,44svh);
+          width:min(
+            100%,
+            620px,
+            calc((100svh - 220px) * 360 / 550)
+          );
         }
 
         .brick-header {
@@ -309,8 +316,11 @@ export default function initBrickBreaker(root, options = {}) {
         }
 
         .brick-game-wrap {
-          width:min(100%,620px,40vh);
-          width:min(100%,620px,40svh);
+          width:min(
+            100%,
+            620px,
+            calc((100svh - 190px) * 360 / 550)
+          );
         }
 
         .brick-message {
@@ -327,6 +337,7 @@ export default function initBrickBreaker(root, options = {}) {
           font-size:.68rem;
         }
       }
+
 
       @media (max-width:360px) {
         .brick-footer {

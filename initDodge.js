@@ -101,7 +101,7 @@ export default function initDodge(root, options = {}) {
           520px,
           max(
             180px,
-            calc((100svh - 175px) * .654545)
+            calc((100svh - 230px) * .54)
           )
         );
         aspect-ratio:360 / 550;
@@ -385,18 +385,65 @@ export default function initDodge(root, options = {}) {
           font-size:.76rem;
         }
       }
+      @media (max-height:720px) {
+        .dodge-screen {
+          padding-top:3px;
+          padding-bottom:5px;
+        }
 
-      @media(max-height:560px) {
+        .dodge-header {
+          margin-bottom:5px;
+        }
+
+        .dodge-controls {
+          margin-top:5px;
+        }
+
+        .dodge-message {
+          min-height:15px;
+          margin-top:3px;
+        }
+
+        .dodge-footer {
+          margin-top:4px;
+        }
+      }
+
+      @media (max-height:560px) {
+        .dodge-screen {
+          padding-top:2px;
+          padding-bottom:3px;
+        }
+
+        .dodge-header {
+          margin-bottom:4px;
+        }
+
+        .dodge-header h3 {
+          font-size:1.1rem;
+        }
+
+        .dodge-header .eyebrow {
+          font-size:.62rem;
+        }
+  
+
+        @media (max-height:460px) {
         .dodge-header {
           margin-bottom:3px;
         }
 
+        .dodge-header h3 {
+          font-size:1rem;
+        }
+
         .dodge-controls {
-          margin-top:4px;
+          margin-top:3px;
         }
 
         .dodge-control {
-          min-height:34px;
+          min-height:29px;
+          font-size:.7rem;
         }
 
         .dodge-message {
@@ -404,11 +451,66 @@ export default function initDodge(root, options = {}) {
         }
 
         .dodge-footer {
-          margin-top:4px;
+          margin-top:3px;
         }
 
         .dodge-new-game {
-          min-height:30px;
+          min-height:27px;
+          padding:4px 8px;
+          font-size:.68rem;
+        }
+      }
+
+      @media (max-width:360px) {
+        .dodge-footer {
+          gap:5px;
+        }
+
+        .dodge-footer-message {
+          font-size:.56rem;
+        }
+
+        .dodge-overlay-card {
+          border-radius:14px;
+          padding:11px 9px;
+        }
+
+        .dodge-overlay-stats {
+          gap:4px;
+          margin-bottom:8px;
+        }
+      }
+
+
+        .dodge-controls {
+          gap:4px;
+          margin-top:4px;
+        }
+
+        .dodge-control {
+          min-height:32px;
+          padding:5px;
+          font-size:.76rem;
+        }
+
+        .dodge-message {
+          min-height:14px;
+          margin-top:3px;
+          font-size:.62rem;
+        }
+
+        .dodge-footer {
+          margin-top:3px;
+        }
+
+        .dodge-new-game {
+          min-height:29px;
+          padding:4px 9px;
+          font-size:.72rem;
+        }
+
+        .dodge-footer-message {
+          font-size:.58rem;
         }
       }
 
