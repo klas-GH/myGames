@@ -4,90 +4,115 @@ export default function initDodge(root, options = {}) {
     vibrate = () => {}
   } = options;
 
+  const doc = root.ownerDocument || document;
+  const win = doc.defaultView || window;
+  const $ = (s) => root.querySelector(s);
+  const $score = (s) => root.querySelector(s) || doc.querySelector(s);
+
   /* ============================================================
-     LOCAL STYLES
+     STYLES
      ============================================================ */
 
   const styleId = "dodge-local-styles";
 
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement("style");
+  if (!doc.getElementById(styleId)) {
+    const style = doc.createElement("style");
 
     style.id = styleId;
 
     style.textContent = `
-      .dodge-screen {
-        --dodge-accent: #38bdf8;
-        --dodge-accent-strong: #0ea5e9;
-
-        width: 100%;
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 8px 0 24px;
-
-        color: inherit;
-
-        user-select: none;
-        -webkit-user-select: none;
-      }
-
+      .dodge-screen,
       .dodge-screen *,
       .dodge-screen *::before,
       .dodge-screen *::after {
-        box-sizing: border-box;
+        box-sizing:border-box;
+        min-width:0;
+      }
+
+      .dodge-screen {
+        --dodge-accent:#38bdf8;
+        width:100%;
+        max-width:760px;
+        margin:0 auto;
+        padding:4px 0 8px;
+        color:inherit;
+        overflow-x:hidden;
+        user-select:none;
+        -webkit-user-select:none;
       }
 
       .dodge-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 14px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+        width:100%;
+        margin-bottom:6px;
+      }
+
+      .dodge-header > div:first-child {
+        min-width:0;
       }
 
       .dodge-header h3 {
-        margin: 2px 0 0;
-        font-size: clamp(1.35rem, 4vw, 1.8rem);
-        line-height: 1.1;
+        margin:1px 0 0;
+        font-size:clamp(1.15rem,4vw,1.55rem);
+        line-height:1.05;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
 
       .dodge-header .eyebrow {
-        margin: 0;
+        margin:0;
       }
 
       .dodge-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 8px 12px;
-
-        border-radius: 999px;
-
-        background: rgba(56,189,248,0.12);
-        border: 1px solid rgba(56,189,248,0.30);
-
-        font-size: 0.78rem;
-        font-weight: 800;
-        white-space: nowrap;
+        display:inline-flex;
+        align-items:center;
+        gap:5px;
+        flex:0 0 auto;
+        max-width:45%;
+        padding:5px 8px;
+        border-radius:999px;
+        background:rgba(56,189,248,.10);
+        border:1px solid rgba(56,189,248,.25);
+        font-size:.66rem;
+        font-weight:800;
+        line-height:1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
 
       .dodge-status-mark {
-        font-size: 1rem;
+        flex:0 0 auto;
+        font-size:.82rem;
       }
 
+      /*
+       * The board scales from both width and screen height.
+       * This is the main fix for phones/tablets/PC.
+       */
       .dodge-game-wrap {
-        position: relative;
-        width: 100%;
-        max-width: 620px;
-        margin: 0 auto;
-        overflow: hidden;
-
-        border-radius: 26px;
-
+        position:relative;
+        width:min(
+          100%,
+          520px,
+          max(
+            180px,
+            calc((100svh - 175px) * .654545)
+          )
+        );
+        aspect-ratio:360 / 550;
+        margin:0 auto;
+        overflow:hidden;
+        border-radius:17px;
+        border:1px solid rgba(56,189,248,.28);
         background:
           radial-gradient(
             circle at 50% 18%,
-            rgba(56,189,248,0.12),
+            rgba(56,189,248,.12),
             transparent 34%
           ),
           linear-gradient(
@@ -95,272 +120,308 @@ export default function initDodge(root, options = {}) {
             #111827,
             #07111d
           );
-
-        border: 2px solid rgba(56,189,248,0.30);
-
         box-shadow:
-          0 22px 60px rgba(0,0,0,0.20),
-          inset 0 1px 0 rgba(255,255,255,0.07);
+          0 12px 30px rgba(0,0,0,.18),
+          inset 0 1px 0 rgba(255,255,255,.06);
       }
 
       .dodge-canvas {
-        display: block;
-        width: 100%;
-        height: auto;
-
-        aspect-ratio: 360 / 550;
-
-        touch-action: none;
-        cursor: crosshair;
-
-        -webkit-tap-highlight-color: transparent;
+        display:block;
+        width:100%;
+        height:100%;
+        touch-action:none;
+        cursor:crosshair;
+        -webkit-tap-highlight-color:transparent;
       }
 
       .dodge-overlay {
-        position: absolute;
-        inset: 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 22px;
-
+        position:absolute;
+        inset:0;
+        z-index:10;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        height:100%;
+        padding:8px;
+        overflow:auto;
         background:
           linear-gradient(
             145deg,
-            rgba(7,17,29,0.92),
-            rgba(15,42,64,0.94)
+            rgba(7,17,29,.91),
+            rgba(15,42,64,.94)
           );
-
-        opacity: 0;
-        visibility: hidden;
-
-        transition:
-          opacity 0.24s ease,
-          visibility 0.24s ease;
-
-        z-index: 10;
+        opacity:0;
+        visibility:hidden;
+        transition:opacity .18s ease,visibility .18s ease;
       }
 
       .dodge-overlay.is-visible {
-        opacity: 1;
-        visibility: visible;
+        opacity:1;
+        visibility:visible;
       }
 
       .dodge-overlay-card {
-        width: min(100%, 340px);
-        padding: 26px 20px;
-
-        text-align: center;
-
-        border-radius: 24px;
-
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.13);
-
-        box-shadow:
-          0 22px 60px rgba(0,0,0,0.30);
-
-        color: #fff;
+        width:min(100%,280px);
+        max-height:100%;
+        overflow:auto;
+        padding:14px 11px;
+        text-align:center;
+        border-radius:16px;
+        background:rgba(255,255,255,.07);
+        border:1px solid rgba(255,255,255,.12);
+        box-shadow:0 14px 32px rgba(0,0,0,.28);
+        color:#fff;
       }
 
       .dodge-overlay-icon {
-        font-size: clamp(3rem, 13vw, 5rem);
-        line-height: 1;
-        margin-bottom: 10px;
+        margin-bottom:5px;
+        font-size:clamp(2.2rem,10vw,3.6rem);
+        line-height:1;
       }
 
       .dodge-overlay h4 {
-        margin: 0 0 7px;
-        font-size: clamp(1.55rem, 6vw, 2.1rem);
+        margin:0 0 5px;
+        font-size:clamp(1.2rem,5vw,1.7rem);
+        line-height:1.05;
       }
 
       .dodge-overlay p {
-        margin: 0 0 17px;
-        font-size: 0.88rem;
-        opacity: 0.76;
+        margin:0 0 10px;
+        font-size:.74rem;
+        line-height:1.3;
+        opacity:.72;
       }
 
       .dodge-overlay-stats {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 18px;
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:5px;
+        margin-bottom:10px;
       }
 
       .dodge-overlay-stat {
-        padding: 10px;
-
-        border-radius: 13px;
-
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.09);
+        padding:7px 5px;
+        border-radius:10px;
+        background:rgba(255,255,255,.07);
+        border:1px solid rgba(255,255,255,.08);
       }
 
       .dodge-overlay-stat span {
-        display: block;
-
-        font-size: 0.62rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-
-        opacity: 0.62;
+        display:block;
+        font-size:.52rem;
+        font-weight:800;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        opacity:.6;
       }
 
       .dodge-overlay-stat strong {
-        display: block;
-
-        margin-top: 3px;
-
-        font-size: 1.1rem;
+        display:block;
+        margin-top:2px;
+        font-size:.95rem;
       }
 
       .dodge-overlay-button {
-        appearance: none;
-        border: 0;
-
-        min-height: 44px;
-        padding: 10px 22px;
-
-        border-radius: 999px;
-
-        background: var(--dodge-accent);
-        color: #fff;
-
-        font: inherit;
-        font-weight: 900;
-
-        cursor: pointer;
-
-        box-shadow:
-          0 8px 24px rgba(56,189,248,0.32);
-
-        transition:
-          transform 0.16s ease,
-          filter 0.16s ease;
+        appearance:none;
+        border:0;
+        min-height:38px;
+        max-width:100%;
+        padding:7px 17px;
+        border-radius:999px;
+        background:var(--dodge-accent);
+        color:#fff;
+        font:inherit;
+        font-size:.84rem;
+        font-weight:900;
+        cursor:pointer;
+        box-shadow:0 6px 18px rgba(56,189,248,.28);
+        transition:transform .12s ease,filter .12s ease;
       }
 
       .dodge-overlay-button:hover {
-        filter: brightness(1.08);
+        filter:brightness(1.08);
       }
 
       .dodge-overlay-button:active {
-        transform: scale(0.95);
+        transform:scale(.96);
       }
 
       .dodge-controls {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-
-        width: 100%;
-        max-width: 620px;
-        margin: 12px auto 0;
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:6px;
+        width:min(100%,520px);
+        margin:6px auto 0;
       }
 
       .dodge-control {
-        appearance: none;
-        border: 1px solid rgba(56,189,248,0.24);
-
-        min-height: 46px;
-
-        border-radius: 15px;
-
-        background: rgba(56,189,248,0.08);
-        color: inherit;
-
-        font: inherit;
-        font-size: 1.05rem;
-        font-weight: 900;
-
-        cursor: pointer;
-
-        touch-action: none;
-
+        appearance:none;
+        width:100%;
+        min-height:40px;
+        padding:6px;
+        border-radius:11px;
+        border:1px solid rgba(56,189,248,.22);
+        background:rgba(56,189,248,.07);
+        color:inherit;
+        font:inherit;
+        font-size:.84rem;
+        font-weight:900;
+        line-height:1;
+        cursor:pointer;
+        touch-action:none;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
         transition:
-          transform 0.12s ease,
-          background 0.12s ease,
-          border-color 0.12s ease;
+          transform .1s ease,
+          background .1s ease,
+          border-color .1s ease;
       }
 
       .dodge-control:active,
       .dodge-control.is-held {
-        transform: scale(0.97);
-
-        background: rgba(56,189,248,0.20);
-        border-color: rgba(56,189,248,0.50);
+        transform:scale(.97);
+        background:rgba(56,189,248,.18);
+        border-color:rgba(56,189,248,.48);
       }
 
       .dodge-message {
-        min-height: 24px;
-        margin: 10px 0 0;
-
-        text-align: center;
-
-        font-size: 0.84rem;
-        font-weight: 750;
-
-        opacity: 0.72;
+        min-height:16px;
+        margin:4px 0 0;
+        text-align:center;
+        font-size:.68rem;
+        font-weight:750;
+        line-height:1.2;
+        opacity:.68;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
       }
 
       .dodge-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        gap: 12px;
-        margin-top: 12px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:6px;
+        width:min(100%,520px);
+        margin:5px auto 0;
       }
 
       .dodge-footer-message {
-        font-size: 0.78rem;
-        font-weight: 700;
-        opacity: 0.60;
+        min-width:0;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        font-size:.62rem;
+        font-weight:700;
+        opacity:.52;
       }
 
       .dodge-new-game {
-        flex-shrink: 0;
+        flex:0 0 auto;
+        min-height:34px;
+        padding:6px 10px;
+        white-space:nowrap;
       }
 
-      @media (max-width: 480px) {
+      @media(max-width:480px) {
         .dodge-screen {
-          padding-left: 2px;
-          padding-right: 2px;
+          padding:3px 0 6px;
         }
 
         .dodge-header {
-          margin-bottom: 11px;
+          margin-bottom:5px;
         }
 
         .dodge-status {
-          padding: 7px 9px;
+          padding:5px 7px;
         }
 
         .dodge-status span:last-child {
-          display: none;
+          display:none;
         }
 
         .dodge-game-wrap {
-          border-radius: 22px;
+          border-radius:15px;
+        }
+
+        .dodge-controls {
+          gap:5px;
+          margin-top:5px;
+        }
+
+        .dodge-control {
+          min-height:38px;
+          border-radius:10px;
+          font-size:.8rem;
+        }
+
+        .dodge-message {
+          margin-top:3px;
+          font-size:.65rem;
         }
 
         .dodge-footer {
-          align-items: flex-start;
+          margin-top:5px;
+        }
+
+        .dodge-new-game {
+          min-height:32px;
+          padding:5px 9px;
         }
       }
 
-      @media (prefers-reduced-motion: reduce) {
+      @media(max-width:340px) {
+        .dodge-footer-message {
+          display:none;
+        }
+
+        .dodge-footer {
+          justify-content:flex-end;
+        }
+
+        .dodge-control {
+          font-size:.76rem;
+        }
+      }
+
+      @media(max-height:560px) {
+        .dodge-header {
+          margin-bottom:3px;
+        }
+
+        .dodge-controls {
+          margin-top:4px;
+        }
+
+        .dodge-control {
+          min-height:34px;
+        }
+
+        .dodge-message {
+          display:none;
+        }
+
+        .dodge-footer {
+          margin-top:4px;
+        }
+
+        .dodge-new-game {
+          min-height:30px;
+        }
+      }
+
+      @media(prefers-reduced-motion:reduce) {
         .dodge-overlay,
         .dodge-overlay-button,
         .dodge-control {
-          transition: none;
+          transition:none;
         }
       }
     `;
 
-    document.head.appendChild(style);
+    doc.head.appendChild(style);
   }
 
   /* ============================================================
@@ -368,10 +429,7 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   root.innerHTML = `
-    <section
-      data-game="dodge"
-      class="dodge-screen"
-    >
+    <section data-game="dodge" class="dodge-screen">
 
       <div class="dodge-header">
         <div>
@@ -380,11 +438,7 @@ export default function initDodge(root, options = {}) {
         </div>
 
         <div class="dodge-status">
-          <span
-            class="dodge-status-mark"
-            aria-hidden="true"
-          >⚡</span>
-
+          <span class="dodge-status-mark" aria-hidden="true">⚡</span>
           <span>Survive the fall</span>
         </div>
       </div>
@@ -419,7 +473,6 @@ export default function initDodge(root, options = {}) {
             </p>
 
             <div class="dodge-overlay-stats">
-
               <div class="dodge-overlay-stat">
                 <span>Score</span>
                 <strong data-dodge-final-score>0</strong>
@@ -429,7 +482,6 @@ export default function initDodge(root, options = {}) {
                 <span>Best</span>
                 <strong data-dodge-final-best>0</strong>
               </div>
-
             </div>
 
             <button
@@ -445,25 +497,19 @@ export default function initDodge(root, options = {}) {
       </div>
 
       <div class="dodge-controls">
-
         <button
           type="button"
           class="dodge-control"
           data-dodge-left
           aria-label="Move left"
-        >
-          ◀ LEFT
-        </button>
+        >◀ LEFT</button>
 
         <button
           type="button"
           class="dodge-control"
           data-dodge-right
           aria-label="Move right"
-        >
-          RIGHT ▶
-        </button>
-
+        >RIGHT ▶</button>
       </div>
 
       <div
@@ -475,7 +521,6 @@ export default function initDodge(root, options = {}) {
       </div>
 
       <div class="dodge-footer">
-
         <span
           class="dodge-footer-message"
           data-dodge-footer
@@ -490,7 +535,6 @@ export default function initDodge(root, options = {}) {
         >
           New Game
         </button>
-
       </div>
 
     </section>
@@ -500,69 +544,29 @@ export default function initDodge(root, options = {}) {
      ELEMENTS
      ============================================================ */
 
-  const canvas =
-    root.querySelector("[data-dodge-canvas]");
+  const canvas = $("[data-dodge-canvas]");
+  const ctx = canvas.getContext("2d");
 
-  const ctx =
-    canvas.getContext("2d");
+  const gameWrap = $(".dodge-game-wrap");
+  const overlay = $("[data-dodge-overlay]");
+  const overlayIcon = $("[data-dodge-overlay-icon]");
+  const overlayTitle = $("[data-dodge-overlay-title]");
+  const overlayMessage = $("[data-dodge-overlay-message]");
+  const finalScore = $("[data-dodge-final-score]");
+  const finalBest = $("[data-dodge-final-best]");
+  const overlayRestart = $("[data-dodge-overlay-restart]");
+  const resetButton = $("[data-dodge-reset]");
+  const messageElement = $("[data-dodge-message]");
+  const footerElement = $("[data-dodge-footer]");
+  const leftButton = $("[data-dodge-left]");
+  const rightButton = $("[data-dodge-right]");
 
-  const overlay =
-    root.querySelector("[data-dodge-overlay]");
-
-  const overlayIcon =
-    root.querySelector("[data-dodge-overlay-icon]");
-
-  const overlayTitle =
-    root.querySelector("[data-dodge-overlay-title]");
-
-  const overlayMessage =
-    root.querySelector("[data-dodge-overlay-message]");
-
-  const finalScore =
-    root.querySelector("[data-dodge-final-score]");
-
-  const finalBest =
-    root.querySelector("[data-dodge-final-best]");
-
-  const overlayRestart =
-    root.querySelector("[data-dodge-overlay-restart]");
-
-  const resetButton =
-    root.querySelector("[data-dodge-reset]");
-
-  const messageElement =
-    root.querySelector("[data-dodge-message]");
-
-  const footerElement =
-    root.querySelector("[data-dodge-footer]");
-
-  const leftButton =
-    root.querySelector("[data-dodge-left]");
-
-  const rightButton =
-    root.querySelector("[data-dodge-right]");
-
-  /* ============================================================
-     APP SCORE ELEMENTS
-     ============================================================ */
-
-  const scoreValueLeft =
-    document.querySelector("#score-value-left");
-
-  const scoreValueCenter =
-    document.querySelector("#score-value-center");
-
-  const scoreValueRight =
-    document.querySelector("#score-value-right");
-
-  const scoreLabelLeft =
-    document.querySelector("#score-label-left");
-
-  const scoreLabelCenter =
-    document.querySelector("#score-label-center");
-
-  const scoreLabelRight =
-    document.querySelector("#score-label-right");
+  const scoreValueLeft = $score("#score-value-left");
+  const scoreValueCenter = $score("#score-value-center");
+  const scoreValueRight = $score("#score-value-right");
+  const scoreLabelLeft = $score("#score-label-left");
+  const scoreLabelCenter = $score("#score-label-center");
+  const scoreLabelRight = $score("#score-label-right");
 
   /* ============================================================
      CONSTANTS
@@ -571,21 +575,16 @@ export default function initDodge(root, options = {}) {
   const BASE_WIDTH = 360;
   const BASE_HEIGHT = 550;
 
-  const BEST_SCORE_KEY =
-    "miniArcade.dodge.best";
+  const BEST_SCORE_KEY = "miniArcade.dodge.best";
 
   const PLAYER_WIDTH = 30;
   const PLAYER_HEIGHT = 25;
-
-  const PLAYER_Y =
-    BASE_HEIGHT - 48;
-
+  const PLAYER_Y = BASE_HEIGHT - 48;
   const PLAYER_SPEED = 310;
 
-  const START_SPAWN_DELAY = 0.75;
-
-  const MIN_SPAWN_INTERVAL = 0.30;
-  const START_SPAWN_INTERVAL = 0.90;
+  const START_SPAWN_DELAY = .75;
+  const MIN_SPAWN_INTERVAL = .30;
+  const START_SPAWN_INTERVAL = .90;
 
   const START_OBSTACLE_SPEED = 165;
   const MAX_OBSTACLE_SPEED = 480;
@@ -596,24 +595,15 @@ export default function initDodge(root, options = {}) {
 
   let score = 0;
   let bestScore = readBestScore();
-
   let elapsed = 0;
   let lastScoreShown = -1;
 
   let spawnTimer = START_SPAWN_DELAY;
-
   let gameOver = false;
   let destroyed = false;
 
   let animationFrame = null;
   let lastFrameTime = 0;
-
-  let canvasWidth = BASE_WIDTH;
-  let canvasHeight = BASE_HEIGHT;
-
-  let scaleX = 1;
-  let scaleY = 1;
-
   let draggingPointerId = null;
 
   const input = {
@@ -622,46 +612,34 @@ export default function initDodge(root, options = {}) {
   };
 
   const player = {
-    x:
-      (BASE_WIDTH - PLAYER_WIDTH) / 2,
-
+    x: (BASE_WIDTH - PLAYER_WIDTH) / 2,
     y: PLAYER_Y,
-
     width: PLAYER_WIDTH,
     height: PLAYER_HEIGHT,
-
     hitFlash: 0
   };
 
   let obstacles = [];
 
-  const stars =
-    Array.from(
-      {
-        length: 42
-      },
-      () => ({
-        x:
-          Math.random() *
-          BASE_WIDTH,
+  const stars = Array.from(
+    { length: 42 },
+    () => ({
+      x: Math.random() * BASE_WIDTH,
+      y: Math.random() * BASE_HEIGHT,
+      radius: .5 + Math.random() * 1.4,
+      alpha: .15 + Math.random() * .45,
+      speed: 8 + Math.random() * 20
+    })
+  );
 
-        y:
-          Math.random() *
-          BASE_HEIGHT,
+  const cleanups = [];
 
-        radius:
-          0.5 +
-          Math.random() * 1.4,
-
-        alpha:
-          0.15 +
-          Math.random() * 0.45,
-
-        speed:
-          8 +
-          Math.random() * 20
-      })
-    );
+  function listen(target, type, handler, options) {
+    target.addEventListener(type, handler, options);
+    cleanups.push(() => {
+      target.removeEventListener(type, handler, options);
+    });
+  }
 
   /* ============================================================
      STORAGE
@@ -669,12 +647,9 @@ export default function initDodge(root, options = {}) {
 
   function readBestScore() {
     try {
-      const value =
-        Number(
-          localStorage.getItem(
-            BEST_SCORE_KEY
-          )
-        );
+      const value = Number(
+        win.localStorage.getItem(BEST_SCORE_KEY)
+      );
 
       return Number.isFinite(value)
         ? Math.max(0, value)
@@ -686,12 +661,12 @@ export default function initDodge(root, options = {}) {
 
   function saveBestScore() {
     try {
-      localStorage.setItem(
+      win.localStorage.setItem(
         BEST_SCORE_KEY,
         String(bestScore)
       );
     } catch {
-      // Storage is optional.
+      // Optional storage.
     }
   }
 
@@ -700,47 +675,33 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function updateScoreUI() {
-    if (scoreValueLeft) {
-      scoreValueLeft.textContent =
-        String(score);
-    }
+    if (scoreValueLeft)
+      scoreValueLeft.textContent = String(score);
 
-    if (scoreValueCenter) {
-      scoreValueCenter.textContent =
-        String(bestScore);
-    }
+    if (scoreValueCenter)
+      scoreValueCenter.textContent = String(bestScore);
 
-    if (scoreValueRight) {
-      scoreValueRight.textContent =
-        `${Math.floor(elapsed)}s`;
-    }
+    if (scoreValueRight)
+      scoreValueRight.textContent = `${Math.floor(elapsed)}s`;
 
-    if (scoreLabelLeft) {
-      scoreLabelLeft.textContent =
-        "Score";
-    }
+    if (scoreLabelLeft)
+      scoreLabelLeft.textContent = "Score";
 
-    if (scoreLabelCenter) {
-      scoreLabelCenter.textContent =
-        "Best";
-    }
+    if (scoreLabelCenter)
+      scoreLabelCenter.textContent = "Best";
 
-    if (scoreLabelRight) {
-      scoreLabelRight.textContent =
-        "Time";
-    }
+    if (scoreLabelRight)
+      scoreLabelRight.textContent = "Time";
   }
 
   function updateMessage(text) {
-    if (messageElement) {
+    if (messageElement)
       messageElement.textContent = text;
-    }
   }
 
   function updateFooter(text) {
-    if (footerElement) {
+    if (footerElement)
       footerElement.textContent = text;
-    }
   }
 
   /* ============================================================
@@ -748,49 +709,29 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function resizeCanvas() {
-    const rect =
-      canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
 
-    const cssWidth =
-      Math.max(
-        280,
-        rect.width || BASE_WIDTH
-      );
+    const cssWidth = Math.max(
+      1,
+      rect.width || BASE_WIDTH
+    );
 
     const cssHeight =
-      cssWidth *
-      (BASE_HEIGHT / BASE_WIDTH);
+      cssWidth * BASE_HEIGHT / BASE_WIDTH;
 
-    const dpr =
-      Math.min(
-        window.devicePixelRatio || 1,
-        2
-      );
+    const dpr = Math.min(
+      win.devicePixelRatio || 1,
+      2
+    );
 
-    canvas.width =
-      Math.round(
-        cssWidth * dpr
-      );
-
-    canvas.height =
-      Math.round(
-        cssHeight * dpr
-      );
-
-    canvasWidth = BASE_WIDTH;
-    canvasHeight = BASE_HEIGHT;
-
-    scaleX =
-      cssWidth / BASE_WIDTH;
-
-    scaleY =
-      cssHeight / BASE_HEIGHT;
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
 
     ctx.setTransform(
-      dpr * scaleX,
+      dpr * cssWidth / BASE_WIDTH,
       0,
       0,
-      dpr * scaleY,
+      dpr * cssHeight / BASE_HEIGHT,
       0,
       0
     );
@@ -800,15 +741,8 @@ export default function initDodge(root, options = {}) {
      HELPERS
      ============================================================ */
 
-  function clamp(
-    value,
-    min,
-    max
-  ) {
-    return Math.max(
-      min,
-      Math.min(max, value)
-    );
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   function roundedRectPath(
@@ -819,20 +753,14 @@ export default function initDodge(root, options = {}) {
     height,
     radius
   ) {
-    const r =
-      Math.min(
-        radius,
-        width / 2,
-        height / 2
-      );
+    const r = Math.min(
+      radius,
+      width / 2,
+      height / 2
+    );
 
     context.beginPath();
-
-    context.moveTo(
-      x + r,
-      y
-    );
-
+    context.moveTo(x + r, y);
     context.arcTo(
       x + width,
       y,
@@ -840,7 +768,6 @@ export default function initDodge(root, options = {}) {
       y + height,
       r
     );
-
     context.arcTo(
       x + width,
       y + height,
@@ -848,7 +775,6 @@ export default function initDodge(root, options = {}) {
       y + height,
       r
     );
-
     context.arcTo(
       x,
       y + height,
@@ -856,7 +782,6 @@ export default function initDodge(root, options = {}) {
       y,
       r
     );
-
     context.arcTo(
       x,
       y,
@@ -864,7 +789,6 @@ export default function initDodge(root, options = {}) {
       y,
       r
     );
-
     context.closePath();
   }
 
@@ -875,16 +799,14 @@ export default function initDodge(root, options = {}) {
   function getSpawnInterval() {
     return Math.max(
       MIN_SPAWN_INTERVAL,
-      START_SPAWN_INTERVAL -
-        elapsed * 0.009
+      START_SPAWN_INTERVAL - elapsed * .009
     );
   }
 
   function getObstacleSpeed() {
     return Math.min(
       MAX_OBSTACLE_SPEED,
-      START_OBSTACLE_SPEED +
-        elapsed * 6.5
+      START_OBSTACLE_SPEED + elapsed * 6.5
     );
   }
 
@@ -894,74 +816,55 @@ export default function initDodge(root, options = {}) {
 
   function resetPlayer() {
     player.x =
-      (
-        BASE_WIDTH -
-        player.width
-      ) / 2;
+      (BASE_WIDTH - player.width) / 2;
 
-    player.y =
-      PLAYER_Y;
-
+    player.y = PLAYER_Y;
     player.hitFlash = 0;
   }
 
   function movePlayer(delta) {
     let direction = 0;
 
-    if (input.left) {
-      direction -= 1;
-    }
+    if (input.left)
+      direction--;
 
-    if (input.right) {
-      direction += 1;
-    }
+    if (input.right)
+      direction++;
 
-    if (direction !== 0) {
+    if (direction) {
       player.x +=
         direction *
         PLAYER_SPEED *
         delta;
     }
 
-    player.x =
-      clamp(
-        player.x,
-        0,
-        BASE_WIDTH -
-          player.width
-      );
+    player.x = clamp(
+      player.x,
+      0,
+      BASE_WIDTH - player.width
+    );
   }
 
-  function updatePlayerFromPointer(
-    clientX
-  ) {
-    if (gameOver) {
+  function updatePlayerFromPointer(clientX) {
+    if (gameOver)
       return;
-    }
 
     const rect =
       canvas.getBoundingClientRect();
 
-    if (!rect.width) {
+    if (!rect.width)
       return;
-    }
 
     const x =
-      (
-        clientX -
-        rect.left
-      ) /
+      (clientX - rect.left) /
       rect.width *
       BASE_WIDTH;
 
-    player.x =
-      clamp(
-        x -
-          player.width / 2,
-        0,
-        BASE_WIDTH -
-          player.width
-      );
+    player.x = clamp(
+      x - player.width / 2,
+      0,
+      BASE_WIDTH - player.width
+    );
   }
 
   /* ============================================================
@@ -969,27 +872,16 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function spawnObstacle() {
-    const width =
-      24 +
-      Math.random() * 46;
-
-    const height =
-      16 +
-      Math.random() * 18;
+    const width = 24 + Math.random() * 46;
+    const height = 16 + Math.random() * 18;
 
     const x =
       Math.random() *
-      (
-        BASE_WIDTH -
-        width
-      );
+      (BASE_WIDTH - width);
 
     const speed =
       getObstacleSpeed() *
-      (
-        0.86 +
-        Math.random() * 0.28
-      );
+      (.86 + Math.random() * .28);
 
     const colors = [
       "#fb7185",
@@ -1002,64 +894,40 @@ export default function initDodge(root, options = {}) {
     const color =
       colors[
         Math.floor(
-          Math.random() *
-          colors.length
+          Math.random() * colors.length
         )
       ];
 
     obstacles.push({
       x,
       y: -height - 8,
-
       width,
       height,
-
       speed,
-
       color,
-
-      glow:
-        color,
-
-      rotation:
-        Math.random() *
-        Math.PI * 2,
-
+      glow: color,
+      rotation: Math.random() * Math.PI * 2,
       rotationSpeed:
-        (
-          Math.random() * 2 -
-          1
-        ) * 2.5
+        (Math.random() * 2 - 1) * 2.5
     });
   }
 
   function clearObstacles() {
-    obstacles = [];
+    obstacles.length = 0;
   }
 
   /* ============================================================
      COLLISION
      ============================================================ */
 
-  function intersects(
-    a,
-    b
-  ) {
+  function intersects(a, b) {
     const padding = 3;
 
     return (
-      a.x + padding <
-        b.x + b.width &&
-      a.x +
-        a.width -
-        padding >
-        b.x &&
-      a.y + padding <
-        b.y + b.height &&
-      a.y +
-        a.height -
-        padding >
-        b.y
+      a.x + padding < b.x + b.width &&
+      a.x + a.width - padding > b.x &&
+      a.y + padding < b.y + b.height &&
+      a.y + a.height - padding > b.y
     );
   }
 
@@ -1068,28 +936,16 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function updateScore() {
-    score =
-      Math.floor(elapsed);
+    score = Math.floor(elapsed);
 
-    if (
-      score ===
-      lastScoreShown
-    ) {
+    if (score === lastScoreShown)
       return;
-    }
 
-    lastScoreShown =
-      score;
-
+    lastScoreShown = score;
     updateScoreUI();
 
-    if (score > 0) {
-      if (
-        score % 10 === 0
-      ) {
-        playTone(500);
-      }
-    }
+    if (score > 0 && score % 10 === 0)
+      playTone(500);
   }
 
   function updateObstacles(delta) {
@@ -1097,9 +953,7 @@ export default function initDodge(root, options = {}) {
 
     if (spawnTimer <= 0) {
       spawnObstacle();
-
-      spawnTimer =
-        getSpawnInterval();
+      spawnTimer = getSpawnInterval();
     }
 
     for (
@@ -1107,53 +961,35 @@ export default function initDodge(root, options = {}) {
       i >= 0;
       i--
     ) {
-      const obstacle =
-        obstacles[i];
+      const obstacle = obstacles[i];
 
       obstacle.y +=
-        obstacle.speed *
-        delta;
+        obstacle.speed * delta;
 
       obstacle.rotation +=
-        obstacle.rotationSpeed *
-        delta;
+        obstacle.rotationSpeed * delta;
 
-      if (
-        intersects(
-          player,
-          obstacle
-        )
-      ) {
+      if (intersects(player, obstacle)) {
         endGame();
         return;
       }
 
-      if (
-        obstacle.y >
-        BASE_HEIGHT + 40
-      ) {
-        obstacles.splice(
-          i,
-          1
-        );
-      }
+      if (obstacle.y > BASE_HEIGHT + 40)
+        obstacles.splice(i, 1);
     }
   }
 
   function update(delta) {
-    if (gameOver) {
+    if (gameOver)
       return;
-    }
 
     elapsed += delta;
 
     movePlayer(delta);
-
     updateObstacles(delta);
 
-    if (gameOver) {
+    if (gameOver)
       return;
-    }
 
     updateScore();
 
@@ -1162,15 +998,13 @@ export default function initDodge(root, options = {}) {
       score % 5 === 0
     ) {
       updateFooter(
-        `Speed ${Math.round(
-          getObstacleSpeed()
-        )} · Keep moving`
+        `Speed ${Math.round(getObstacleSpeed())} · Keep moving`
       );
     }
   }
 
   /* ============================================================
-     DRAW BACKGROUND
+     DRAW
      ============================================================ */
 
   function drawBackground() {
@@ -1182,24 +1016,11 @@ export default function initDodge(root, options = {}) {
         BASE_HEIGHT
       );
 
-    gradient.addColorStop(
-      0,
-      "#07111d"
-    );
+    gradient.addColorStop(0, "#07111d");
+    gradient.addColorStop(.55, "#0b1725");
+    gradient.addColorStop(1, "#07101a");
 
-    gradient.addColorStop(
-      0.55,
-      "#0b1725"
-    );
-
-    gradient.addColorStop(
-      1,
-      "#07101a"
-    );
-
-    ctx.fillStyle =
-      gradient;
-
+    ctx.fillStyle = gradient;
     ctx.fillRect(
       0,
       0,
@@ -1219,7 +1040,7 @@ export default function initDodge(root, options = {}) {
 
     glow.addColorStop(
       0,
-      "rgba(56,189,248,0.12)"
+      "rgba(56,189,248,.12)"
     );
 
     glow.addColorStop(
@@ -1227,8 +1048,7 @@ export default function initDodge(root, options = {}) {
       "rgba(56,189,248,0)"
     );
 
-    ctx.fillStyle =
-      glow;
+    ctx.fillStyle = glow;
 
     ctx.fillRect(
       0,
@@ -1239,22 +1059,14 @@ export default function initDodge(root, options = {}) {
 
     ctx.save();
 
-    stars.forEach((star) => {
-      star.y +=
-        star.speed * 0.002;
+    for (const star of stars) {
+      star.y += star.speed * .002;
 
-      if (
-        star.y >
-        BASE_HEIGHT
-      ) {
+      if (star.y > BASE_HEIGHT)
         star.y = 0;
-      }
 
-      ctx.globalAlpha =
-        star.alpha;
-
-      ctx.fillStyle =
-        "#dbeafe";
+      ctx.globalAlpha = star.alpha;
+      ctx.fillStyle = "#dbeafe";
 
       ctx.beginPath();
 
@@ -1267,14 +1079,14 @@ export default function initDodge(root, options = {}) {
       );
 
       ctx.fill();
-    });
+    }
 
     ctx.restore();
 
     ctx.save();
 
     ctx.strokeStyle =
-      "rgba(56,189,248,0.055)";
+      "rgba(56,189,248,.055)";
 
     ctx.lineWidth = 1;
 
@@ -1285,67 +1097,44 @@ export default function initDodge(root, options = {}) {
     ) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(
-        BASE_WIDTH,
-        y
-      );
+      ctx.lineTo(BASE_WIDTH, y);
       ctx.stroke();
     }
 
     ctx.restore();
   }
 
-  /* ============================================================
-     DRAW PLAYER
-     ============================================================ */
-
   function drawPlayer() {
-    const flash =
-      player.hitFlash > 0;
+    const flash = player.hitFlash > 0;
 
-    if (
-      player.hitFlash > 0
-    ) {
-      player.hitFlash =
-        Math.max(
-          0,
-          player.hitFlash - 0.08
-        );
+    if (player.hitFlash > 0) {
+      player.hitFlash = Math.max(
+        0,
+        player.hitFlash - .08
+      );
     }
 
     ctx.save();
 
-    ctx.shadowColor =
-      flash
-        ? "#ffffff"
-        : "rgba(56,189,248,0.85)";
+    ctx.shadowColor = flash
+      ? "#fff"
+      : "rgba(56,189,248,.85)";
 
     ctx.shadowBlur =
-      flash
-        ? 26
-        : 16;
+      flash ? 26 : 16;
 
     const gradient =
       ctx.createLinearGradient(
         player.x,
         player.y,
         player.x,
-        player.y +
-          player.height
+        player.y + player.height
       );
 
-    gradient.addColorStop(
-      0,
-      "#7dd3fc"
-    );
+    gradient.addColorStop(0, "#7dd3fc");
+    gradient.addColorStop(1, "#0284c7");
 
-    gradient.addColorStop(
-      1,
-      "#0284c7"
-    );
-
-    ctx.fillStyle =
-      gradient;
+    ctx.fillStyle = gradient;
 
     roundedRectPath(
       ctx,
@@ -1361,7 +1150,7 @@ export default function initDodge(root, options = {}) {
     ctx.shadowBlur = 0;
 
     ctx.fillStyle =
-      "rgba(255,255,255,0.72)";
+      "rgba(255,255,255,.72)";
 
     roundedRectPath(
       ctx,
@@ -1374,8 +1163,7 @@ export default function initDodge(root, options = {}) {
 
     ctx.fill();
 
-    ctx.fillStyle =
-      "#082f49";
+    ctx.fillStyle = "#082f49";
 
     ctx.beginPath();
 
@@ -1400,118 +1188,82 @@ export default function initDodge(root, options = {}) {
     ctx.restore();
   }
 
-  /* ============================================================
-     DRAW OBSTACLES
-     ============================================================ */
-
   function drawObstacles() {
-    obstacles.forEach(
-      (obstacle) => {
-        const centerX =
-          obstacle.x +
-          obstacle.width / 2;
+    for (const obstacle of obstacles) {
+      const centerX =
+        obstacle.x + obstacle.width / 2;
 
-        const centerY =
-          obstacle.y +
-          obstacle.height / 2;
+      const centerY =
+        obstacle.y + obstacle.height / 2;
 
-        ctx.save();
+      ctx.save();
 
-        ctx.translate(
-          centerX,
-          centerY
-        );
+      ctx.translate(centerX, centerY);
+      ctx.rotate(obstacle.rotation);
 
-        ctx.rotate(
-          obstacle.rotation
-        );
+      ctx.shadowColor = obstacle.glow;
+      ctx.shadowBlur = 12;
 
-        ctx.shadowColor =
-          obstacle.glow;
-
-        ctx.shadowBlur = 12;
-
-        const gradient =
-          ctx.createLinearGradient(
-            -obstacle.width / 2,
-            -obstacle.height / 2,
-            obstacle.width / 2,
-            obstacle.height / 2
-          );
-
-        gradient.addColorStop(
-          0,
-          "#ffffff"
-        );
-
-        gradient.addColorStop(
-          0.12,
-          obstacle.color
-        );
-
-        gradient.addColorStop(
-          1,
-          "#7f1d1d"
-        );
-
-        ctx.fillStyle =
-          gradient;
-
-        roundedRectPath(
-          ctx,
+      const gradient =
+        ctx.createLinearGradient(
           -obstacle.width / 2,
           -obstacle.height / 2,
-          obstacle.width,
-          obstacle.height,
-          6
+          obstacle.width / 2,
+          obstacle.height / 2
         );
 
-        ctx.fill();
+      gradient.addColorStop(0, "#fff");
+      gradient.addColorStop(.12, obstacle.color);
+      gradient.addColorStop(1, "#7f1d1d");
 
-        ctx.shadowBlur = 0;
+      ctx.fillStyle = gradient;
 
-        ctx.strokeStyle =
-          "rgba(255,255,255,0.20)";
+      roundedRectPath(
+        ctx,
+        -obstacle.width / 2,
+        -obstacle.height / 2,
+        obstacle.width,
+        obstacle.height,
+        6
+      );
 
-        ctx.lineWidth = 1;
+      ctx.fill();
 
-        roundedRectPath(
-          ctx,
-          -obstacle.width / 2 + 0.5,
-          -obstacle.height / 2 + 0.5,
-          obstacle.width - 1,
-          obstacle.height - 1,
-          6
-        );
+      ctx.shadowBlur = 0;
 
-        ctx.stroke();
+      ctx.strokeStyle =
+        "rgba(255,255,255,.20)";
 
-        ctx.restore();
-      }
-    );
+      ctx.lineWidth = 1;
+
+      roundedRectPath(
+        ctx,
+        -obstacle.width / 2 + .5,
+        -obstacle.height / 2 + .5,
+        obstacle.width - 1,
+        obstacle.height - 1,
+        6
+      );
+
+      ctx.stroke();
+
+      ctx.restore();
+    }
   }
-
-  /* ============================================================
-     DRAW HUD
-     ============================================================ */
 
   function drawHud() {
     ctx.save();
 
     ctx.fillStyle =
-      "rgba(255,255,255,0.52)";
+      "rgba(255,255,255,.52)";
 
     ctx.font =
-      "700 10px system-ui, sans-serif";
+      "700 10px system-ui,sans-serif";
 
-    ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    ctx.fillText(
-      `${score}s`,
-      14,
-      15
-    );
+    ctx.textAlign = "left";
+    ctx.fillText(`${score}s`, 14, 15);
 
     ctx.textAlign = "right";
 
@@ -1524,23 +1276,15 @@ export default function initDodge(root, options = {}) {
     ctx.restore();
   }
 
-  /* ============================================================
-     DRAW HINT
-     ============================================================ */
-
   function drawHint() {
-    if (
-      elapsed > 4 ||
-      gameOver
-    ) {
+    if (elapsed > 4 || gameOver)
       return;
-    }
 
     const alpha =
-      0.48 +
+      .48 +
       Math.sin(
-        performance.now() / 300
-      ) * 0.15;
+        win.performance.now() / 300
+      ) * .15;
 
     ctx.save();
 
@@ -1548,7 +1292,7 @@ export default function initDodge(root, options = {}) {
       `rgba(255,255,255,${alpha})`;
 
     ctx.font =
-      "700 12px system-ui, sans-serif";
+      "700 12px system-ui,sans-serif";
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -1562,18 +1306,13 @@ export default function initDodge(root, options = {}) {
     ctx.restore();
   }
 
-  /* ============================================================
-     DRAW
-     ============================================================ */
-
   function draw() {
-    if (!ctx) {
+    if (!ctx)
       return;
-    }
 
     ctx.clearRect(
       0,
-            0,
+      0,
       BASE_WIDTH,
       BASE_HEIGHT
     );
@@ -1590,36 +1329,27 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function gameLoop(timestamp) {
-    if (destroyed) {
+    if (destroyed)
       return;
-    }
 
-    if (!lastFrameTime) {
+    if (!lastFrameTime)
       lastFrameTime = timestamp;
-    }
 
     let delta =
       (timestamp - lastFrameTime) / 1000;
 
     lastFrameTime = timestamp;
 
-    /*
-     * Prevent huge jumps when the browser tab is
-     * inactive or the device is temporarily busy.
-     */
-    delta =
-      Math.min(
-        0.05,
-        Math.max(0, delta)
-      );
+    delta = Math.min(
+      .05,
+      Math.max(0, delta)
+    );
 
     update(delta);
     draw();
 
     animationFrame =
-      requestAnimationFrame(
-        gameLoop
-      );
+      win.requestAnimationFrame(gameLoop);
   }
 
   /* ============================================================
@@ -1627,44 +1357,34 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function hideOverlay() {
-    overlay.classList.remove(
-      "is-visible"
-    );
+    overlay.classList.remove("is-visible");
   }
 
   function showOverlay() {
-    overlay.classList.add(
-      "is-visible"
-    );
+    overlay.classList.add("is-visible");
+  }
+
+  function resetDirectionButtons() {
+    input.left = false;
+    input.right = false;
+
+    leftButton.classList.remove("is-held");
+    rightButton.classList.remove("is-held");
   }
 
   function startGame() {
-    if (destroyed) {
+    if (destroyed)
       return;
-    }
 
     score = 0;
     elapsed = 0;
     lastScoreShown = -1;
-
-    spawnTimer =
-      START_SPAWN_DELAY;
+    spawnTimer = START_SPAWN_DELAY;
 
     gameOver = false;
-
     draggingPointerId = null;
 
-    input.left = false;
-    input.right = false;
-
-    leftButton.classList.remove(
-      "is-held"
-    );
-
-    rightButton.classList.remove(
-      "is-held"
-    );
-
+    resetDirectionButtons();
     clearObstacles();
     resetPlayer();
 
@@ -1680,76 +1400,43 @@ export default function initDodge(root, options = {}) {
 
     updateScoreUI();
 
-    lastFrameTime =
-      performance.now();
+    lastFrameTime = win.performance.now();
 
-    if (
-      animationFrame === null
-    ) {
+    if (animationFrame === null) {
       animationFrame =
-        requestAnimationFrame(
-          gameLoop
-        );
+        win.requestAnimationFrame(gameLoop);
     }
   }
 
   function endGame() {
-    if (
-      gameOver ||
-      destroyed
-    ) {
+    if (gameOver || destroyed)
       return;
-    }
 
     gameOver = true;
 
-    input.left = false;
-    input.right = false;
-
-    leftButton.classList.remove(
-      "is-held"
-    );
-
-    rightButton.classList.remove(
-      "is-held"
-    );
+    resetDirectionButtons();
 
     player.hitFlash = 1;
 
-    score =
-      Math.floor(elapsed);
+    score = Math.floor(elapsed);
 
-    if (
-      score >
-      bestScore
-    ) {
+    if (score > bestScore) {
       bestScore = score;
       saveBestScore();
 
-      overlayIcon.textContent =
-        "🏆";
-
-      overlayTitle.textContent =
-        "New Best!";
-
+      overlayIcon.textContent = "🏆";
+      overlayTitle.textContent = "New Best!";
       overlayMessage.textContent =
         "Amazing run. Can you beat it again?";
     } else {
-      overlayIcon.textContent =
-        "💥";
-
-      overlayTitle.textContent =
-        "Game Over";
-
+      overlayIcon.textContent = "💥";
+      overlayTitle.textContent = "Game Over";
       overlayMessage.textContent =
         "You got caught. Try again!";
     }
 
-    finalScore.textContent =
-      String(score);
-
-    finalBest.textContent =
-      String(bestScore);
+    finalScore.textContent = String(score);
+    finalBest.textContent = String(bestScore);
 
     updateScoreUI();
 
@@ -1766,45 +1453,37 @@ export default function initDodge(root, options = {}) {
     try {
       vibrate(100);
     } catch {
-      // Vibration is optional.
+      // Optional vibration.
     }
 
     showOverlay();
   }
 
   /* ============================================================
-     KEYBOARD INPUT
+     KEYBOARD
      ============================================================ */
 
   function handleKeyDown(event) {
-    if (destroyed) {
+    if (destroyed)
       return;
-    }
 
     const key =
       String(event.key).toLowerCase();
 
-    const isLeft =
-      key === "arrowleft" ||
-      key === "a";
+    const left =
+      key === "arrowleft" || key === "a";
 
-    const isRight =
-      key === "arrowright" ||
-      key === "d";
+    const right =
+      key === "arrowright" || key === "d";
 
-    if (
-      isLeft ||
-      isRight
-    ) {
+    if (left || right) {
       event.preventDefault();
 
-      if (isLeft) {
+      if (left)
         input.left = true;
-      }
 
-      if (isRight) {
+      if (right)
         input.right = true;
-      }
 
       return;
     }
@@ -1818,15 +1497,13 @@ export default function initDodge(root, options = {}) {
       )
     ) {
       event.preventDefault();
-
       startGame();
     }
   }
 
   function handleKeyUp(event) {
-    if (destroyed) {
+    if (destroyed)
       return;
-    }
 
     const key =
       String(event.key).toLowerCase();
@@ -1850,123 +1527,53 @@ export default function initDodge(root, options = {}) {
      BUTTON INPUT
      ============================================================ */
 
-  function pressDirection(
-    direction,
-    button
-  ) {
-    if (gameOver) {
-      return;
-    }
+  function bindDirectionButton(button, direction) {
+    const down = (event) => {
+      event.preventDefault();
 
-    input[direction] = true;
+      if (gameOver)
+        return;
 
-    button.classList.add(
-      "is-held"
-    );
-  }
+      input[direction] = true;
+      button.classList.add("is-held");
 
-  function releaseDirection(
-    direction,
-    button
-  ) {
-    input[direction] = false;
+      try {
+        button.setPointerCapture(
+          event.pointerId
+        );
+      } catch {}
+    };
 
-    button.classList.remove(
-      "is-held"
-    );
-  }
+    const up = (event) => {
+      event.preventDefault();
 
-  function handleLeftPointerDown(
-    event
-  ) {
-    event.preventDefault();
+      input[direction] = false;
+      button.classList.remove("is-held");
 
-    pressDirection(
-      "left",
-      leftButton
-    );
+      try {
+        button.releasePointerCapture(
+          event.pointerId
+        );
+      } catch {}
+    };
 
-    try {
-      leftButton.setPointerCapture(
-        event.pointerId
-      );
-    } catch {
-      // Pointer capture is optional.
-    }
-  }
-
-  function handleLeftPointerUp(
-    event
-  ) {
-    event.preventDefault();
-
-    releaseDirection(
-      "left",
-      leftButton
-    );
-
-    try {
-      leftButton.releasePointerCapture(
-        event.pointerId
-      );
-    } catch {
-      // Pointer capture is optional.
-    }
-  }
-
-  function handleRightPointerDown(
-    event
-  ) {
-    event.preventDefault();
-
-    pressDirection(
-      "right",
-      rightButton
-    );
-
-    try {
-      rightButton.setPointerCapture(
-        event.pointerId
-      );
-    } catch {
-      // Pointer capture is optional.
-    }
-  }
-
-  function handleRightPointerUp(
-    event
-  ) {
-    event.preventDefault();
-
-    releaseDirection(
-      "right",
-      rightButton
-    );
-
-    try {
-      rightButton.releasePointerCapture(
-        event.pointerId
-      );
-    } catch {
-      // Pointer capture is optional.
-    }
+    listen(button, "pointerdown", down);
+    listen(button, "pointerup", up);
+    listen(button, "pointercancel", up);
+    listen(button, "pointerleave", up);
   }
 
   /* ============================================================
-     CANVAS POINTER CONTROL
+     CANVAS TOUCH / POINTER
      ============================================================ */
 
-  function handleCanvasPointerDown(
-    event
-  ) {
-    if (gameOver) {
+  function handleCanvasPointerDown(event) {
+    if (gameOver)
       return;
-    }
 
     event.preventDefault();
 
-    draggingPointerId =
-      event.pointerId;
+    draggingPointerId = event.pointerId;
 
     updatePlayerFromPointer(
       event.clientX
@@ -1976,14 +1583,10 @@ export default function initDodge(root, options = {}) {
       canvas.setPointerCapture(
         event.pointerId
       );
-    } catch {
-      // Pointer capture is optional.
-    }
+    } catch {}
   }
 
-  function handleCanvasPointerMove(
-    event
-  ) {
+  function handleCanvasPointerMove(event) {
     if (
       draggingPointerId !==
       event.pointerId
@@ -1998,9 +1601,7 @@ export default function initDodge(root, options = {}) {
     );
   }
 
-  function handleCanvasPointerUp(
-    event
-  ) {
+  function handleCanvasPointerUp(event) {
     if (
       draggingPointerId !==
       event.pointerId
@@ -2014,40 +1615,31 @@ export default function initDodge(root, options = {}) {
       canvas.releasePointerCapture(
         event.pointerId
       );
-    } catch {
-      // Pointer capture is optional.
-    }
+    } catch {}
   }
 
   /* ============================================================
-     RESIZE HANDLING
+     RESIZE
      ============================================================ */
 
   let resizeObserver = null;
 
   function handleResize() {
-    if (destroyed) {
+    if (destroyed)
       return;
-    }
 
     resizeCanvas();
     draw();
   }
 
-  if (
-    typeof ResizeObserver !==
-    "undefined"
-  ) {
+  if (typeof win.ResizeObserver !== "undefined") {
     resizeObserver =
-      new ResizeObserver(
-        handleResize
-      );
+      new win.ResizeObserver(handleResize);
 
-    resizeObserver.observe(
-      canvas
-    );
+    resizeObserver.observe(gameWrap);
   } else {
-    window.addEventListener(
+    listen(
+      win,
       "resize",
       handleResize
     );
@@ -2058,106 +1650,81 @@ export default function initDodge(root, options = {}) {
      ============================================================ */
 
   function handleVisibilityChange() {
-    if (document.hidden) {
-      lastFrameTime =
-        performance.now();
-    }
+    if (doc.hidden)
+      lastFrameTime = win.performance.now();
   }
 
   /* ============================================================
      EVENTS
      ============================================================ */
 
-  window.addEventListener(
+  listen(
+    win,
     "keydown",
     handleKeyDown,
-    {
-      passive: false
-    }
+    { passive:false }
   );
 
-  window.addEventListener(
+  listen(
+    win,
     "keyup",
     handleKeyUp
   );
 
-  document.addEventListener(
+  listen(
+    doc,
     "visibilitychange",
     handleVisibilityChange
   );
 
-  leftButton.addEventListener(
-    "pointerdown",
-    handleLeftPointerDown
+  bindDirectionButton(
+    leftButton,
+    "left"
   );
 
-  leftButton.addEventListener(
-    "pointerup",
-    handleLeftPointerUp
+  bindDirectionButton(
+    rightButton,
+    "right"
   );
 
-  leftButton.addEventListener(
-    "pointercancel",
-    handleLeftPointerUp
-  );
-
-  leftButton.addEventListener(
-    "pointerleave",
-    handleLeftPointerUp
-  );
-
-  rightButton.addEventListener(
-    "pointerdown",
-    handleRightPointerDown
-  );
-
-  rightButton.addEventListener(
-    "pointerup",
-    handleRightPointerUp
-  );
-
-  rightButton.addEventListener(
-    "pointercancel",
-    handleRightPointerUp
-  );
-
-  rightButton.addEventListener(
-    "pointerleave",
-    handleRightPointerUp
-  );
-
-  canvas.addEventListener(
+  listen(
+    canvas,
     "pointerdown",
     handleCanvasPointerDown
   );
 
-  canvas.addEventListener(
+  listen(
+    canvas,
     "pointermove",
     handleCanvasPointerMove
   );
 
-  canvas.addEventListener(
+  listen(
+    canvas,
     "pointerup",
     handleCanvasPointerUp
   );
 
-  canvas.addEventListener(
+  listen(
+    canvas,
     "pointercancel",
     handleCanvasPointerUp
   );
 
-  overlayRestart.addEventListener(
+  listen(
+    overlayRestart,
     "click",
     startGame
   );
 
-  resetButton.addEventListener(
+  listen(
+    resetButton,
     "click",
     startGame
   );
 
   /* ============================================================
-     INITIALIZE
+     INIT
      ============================================================ */
 
   resizeCanvas();
@@ -2166,145 +1733,43 @@ export default function initDodge(root, options = {}) {
   draw();
 
   animationFrame =
-    requestAnimationFrame(
-      gameLoop
-    );
+    win.requestAnimationFrame(gameLoop);
 
-    /* ============================================================
+  /* ============================================================
      PUBLIC API
      ============================================================ */
 
-    function reset() {
-        startGame();
-    }
+  function reset() {
+    startGame();
+  }
 
-
-
-  /* ============================================================
-     CLEANUP
-     ============================================================ */
-
-   function destroy() {
-    if (destroyed) {
+  function destroy() {
+    if (destroyed)
       return;
-    }
 
     destroyed = true;
 
-    if (
-      animationFrame !== null
-    ) {
-      cancelAnimationFrame(
-        animationFrame
-      );
-
+    if (animationFrame !== null) {
+      win.cancelAnimationFrame(animationFrame);
       animationFrame = null;
     }
 
     if (resizeObserver) {
       resizeObserver.disconnect();
       resizeObserver = null;
-    } else {
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
     }
 
-    window.removeEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    window.removeEventListener(
-      "keyup",
-      handleKeyUp
-    );
-
-    document.removeEventListener(
-      "visibilitychange",
-      handleVisibilityChange
-    );
-
-    leftButton.removeEventListener(
-      "pointerdown",
-      handleLeftPointerDown
-    );
-
-    leftButton.removeEventListener(
-      "pointerup",
-      handleLeftPointerUp
-    );
-
-    leftButton.removeEventListener(
-      "pointercancel",
-      handleLeftPointerUp
-    );
-
-    leftButton.removeEventListener(
-      "pointerleave",
-      handleLeftPointerUp
-    );
-
-    rightButton.removeEventListener(
-      "pointerdown",
-      handleRightPointerDown
-    );
-
-    rightButton.removeEventListener(
-      "pointerup",
-      handleRightPointerUp
-    );
-
-    rightButton.removeEventListener(
-      "pointercancel",
-      handleRightPointerUp
-    );
-
-    rightButton.removeEventListener(
-      "pointerleave",
-      handleRightPointerUp
-    );
-
-    canvas.removeEventListener(
-      "pointerdown",
-      handleCanvasPointerDown
-    );
-
-    canvas.removeEventListener(
-      "pointermove",
-      handleCanvasPointerMove
-    );
-
-    canvas.removeEventListener(
-      "pointerup",
-      handleCanvasPointerUp
-    );
-
-    canvas.removeEventListener(
-      "pointercancel",
-      handleCanvasPointerUp
-    );
-
-    overlayRestart.removeEventListener(
-      "click",
-      startGame
-    );
-
-    resetButton.removeEventListener(
-      "click",
-      startGame
-    );
+    for (const cleanup of cleanups)
+      cleanup();
 
     input.left = false;
     input.right = false;
 
     clearObstacles();
-  };
-
-    return {
-    reset,
-    destroy
   }
 
+  return {
+    reset,
+    destroy
+  };
 }

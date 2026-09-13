@@ -25,11 +25,36 @@ export function initTicTacToe({
   ];
 
   /* ============================================================
+     RESULT TIMER
+     ============================================================ */
+
+  let resultTimer = null;
+
+  const scheduleResultModal = (callback) => {
+    window.clearTimeout(resultTimer);
+
+    resultTimer = window.setTimeout(() => {
+      /*
+       * Do not show the result modal if the player
+       * already left Tic-Tac-Toe.
+       */
+      if (state.activeGame?.id !== "tictactoe") {
+        return;
+      }
+
+      callback();
+    }, 300);
+  };
+
+  /* ============================================================
      RESET
      ============================================================ */
 
   const resetTicTacToe = () => {
     console.log("TTT: reset");
+
+    window.clearTimeout(resultTimer);
+    resultTimer = null;
 
     state.ticTacToe.board =
       Array(9).fill(null);
@@ -227,12 +252,12 @@ export function initTicTacToe({
 
       renderTicTacToe();
 
-      window.setTimeout(() => {
+      scheduleResultModal(() => {
         showTicTacToeResult(
           "win",
           result.player
         );
-      }, 300);
+      });
 
       return;
     }
@@ -254,9 +279,9 @@ export function initTicTacToe({
 
       renderTicTacToe();
 
-      window.setTimeout(() => {
+      scheduleResultModal(() => {
         showTicTacToeResult("draw");
-      }, 300);
+      });
 
       return;
     }
@@ -453,6 +478,20 @@ export function initTicTacToe({
   return {
     reset: resetTicTacToe,
     render: renderTicTacToe,
-    start: resetTicTacToe
+
+    /*
+     * Intentionally resets when opening TTT.
+     * This is the desired arcade behavior:
+     * leave game → return → fresh round.
+     */
+    start: resetTicTacToe,
+
+    /*
+     * API preserved for future app-level cleanup.
+     */
+    destroy: () => {
+      window.clearTimeout(resultTimer);
+      resultTimer = null;
+    }
   };
 }

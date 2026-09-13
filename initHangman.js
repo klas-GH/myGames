@@ -25,14 +25,15 @@ export default function initHangman(root, options = {}) {
         --hangman-danger: #ef4444;
 
         width: 100%;
-        max-width: 620px;
+        max-width: 560px;
         margin: 0 auto;
-        padding: 8px 0 24px;
+        padding: 4px 0 12px;
 
         color: inherit;
 
         user-select: none;
         -webkit-user-select: none;
+        overflow: hidden;
       }
 
       .hangman-screen *,
@@ -47,63 +48,62 @@ export default function initHangman(root, options = {}) {
 
       .hangman-header {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
 
-        margin-bottom: 14px;
+        margin-bottom: 8px;
       }
 
       .hangman-header h3 {
-        margin: 2px 0 0;
+        margin: 1px 0 0;
 
-        font-size:
-          clamp(1.45rem, 5vw, 1.9rem);
+        font-size: clamp(1.2rem, 4.5vw, 1.55rem);
+        line-height: 1.05;
+      }
 
-        line-height: 1.1;
+      .hangman-header .eyebrow {
+        margin: 0;
+        font-size: 0.62rem;
       }
 
       .hangman-badges {
         display: flex;
-        gap: 7px;
+        gap: 5px;
       }
 
       .hangman-score-box {
-        min-width: 67px;
-
-        padding: 7px 9px;
+        min-width: 58px;
+        padding: 5px 7px;
 
         text-align: center;
 
-        border-radius: 12px;
+        border-radius: 9px;
 
-        background:
-          rgba(139,92,246,0.10);
-
-        border:
-          1px solid
-          rgba(139,92,246,0.24);
+        background: rgba(139,92,246,0.10);
+        border: 1px solid rgba(139,92,246,0.22);
       }
 
       .hangman-score-label {
         display: block;
 
-        font-size: 0.57rem;
+        font-size: 0.5rem;
         font-weight: 900;
 
-        letter-spacing: 0.08em;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
 
-        opacity: 0.58;
+        opacity: 0.56;
       }
 
       .hangman-score-value {
         display: block;
 
-        margin-top: 2px;
+        margin-top: 1px;
 
-        font-size: 1rem;
+        font-size: 0.88rem;
         font-weight: 950;
+        line-height: 1.1;
       }
 
       /* ========================================================
@@ -115,24 +115,21 @@ export default function initHangman(root, options = {}) {
 
         width: 100%;
 
-        padding: 16px;
+        padding: 10px;
 
-        border-radius: 24px;
+        border-radius: 18px;
 
         background:
           linear-gradient(
             145deg,
-            rgba(139,92,246,0.14),
-            rgba(124,58,237,0.06)
+            rgba(139,92,246,0.13),
+            rgba(124,58,237,0.055)
           );
 
-        border:
-          1px solid
-          rgba(139,92,246,0.18);
+        border: 1px solid rgba(139,92,246,0.17);
 
         box-shadow:
-          0 20px 55px
-          rgba(0,0,0,0.16);
+          0 12px 32px rgba(0,0,0,0.13);
       }
 
       /* ========================================================
@@ -141,49 +138,38 @@ export default function initHangman(root, options = {}) {
 
       .hangman-info {
         display: flex;
-
         align-items: center;
         justify-content: space-between;
 
-        gap: 10px;
+        gap: 7px;
 
-        margin-bottom: 12px;
+        margin-bottom: 7px;
       }
 
       .hangman-category {
         display: inline-flex;
-
         align-items: center;
 
-        min-height: 30px;
+        min-height: 25px;
 
-        padding: 5px 11px;
+        padding: 3px 8px;
 
         border-radius: 999px;
 
-        background:
-          rgba(139,92,246,0.12);
+        background: rgba(139,92,246,0.11);
+        border: 1px solid rgba(139,92,246,0.18);
 
-        border:
-          1px solid
-          rgba(139,92,246,0.20);
+        color: var(--hangman-accent);
 
-        color:
-          var(--hangman-accent);
-
-        font-size: 0.72rem;
-
+        font-size: 0.62rem;
         font-weight: 900;
-
-        letter-spacing: 0.04em;
+        letter-spacing: 0.03em;
       }
 
       .hangman-difficulty {
-        font-size: 0.72rem;
-
+        font-size: 0.62rem;
         font-weight: 900;
-
-        opacity: 0.62;
+        opacity: 0.58;
       }
 
       /* ========================================================
@@ -198,22 +184,20 @@ export default function initHangman(root, options = {}) {
         justify-content: center;
 
         width: 100%;
+        height: clamp(130px, 31vw, 160px);
 
-        height: 205px;
+        margin-bottom: 2px;
 
-        margin-bottom: 6px;
+        border-radius: 13px;
 
-        border-radius: 18px;
-
-        background:
-          rgba(0,0,0,0.08);
+        background: rgba(0,0,0,0.065);
 
         overflow: hidden;
       }
 
       .hangman-svg {
-        width: min(230px, 72vw);
-        height: 190px;
+        width: min(185px, 62vw);
+        height: clamp(125px, 29vw, 150px);
 
         overflow: visible;
       }
@@ -221,18 +205,14 @@ export default function initHangman(root, options = {}) {
       .hangman-part {
         fill: none;
 
-        stroke:
-          currentColor;
-
-        stroke-width: 7;
-
+        stroke: currentColor;
+        stroke-width: 6;
         stroke-linecap: round;
         stroke-linejoin: round;
 
         opacity: 0;
 
-        transition:
-          opacity 180ms ease;
+        transition: opacity 180ms ease;
       }
 
       .hangman-part.is-visible {
@@ -240,8 +220,7 @@ export default function initHangman(root, options = {}) {
       }
 
       .hangman-rope {
-        stroke:
-          var(--hangman-danger);
+        stroke: var(--hangman-danger);
       }
 
       /* ========================================================
@@ -250,52 +229,44 @@ export default function initHangman(root, options = {}) {
 
       .hangman-word {
         display: flex;
-
         flex-wrap: wrap;
-
         justify-content: center;
 
-        gap: 6px;
+        gap: 4px;
 
-        min-height: 58px;
+        min-height: 43px;
 
-        margin: 7px 0 10px;
+        margin: 5px 0 5px;
+        padding: 2px;
 
-        padding: 4px;
+        max-width: 100%;
+        overflow: hidden;
       }
 
       .hangman-letter {
         display: flex;
-
         align-items: center;
         justify-content: center;
 
-        width: clamp(24px, 7vw, 38px);
-        height: clamp(36px, 9vw, 48px);
+        flex: 0 0 clamp(20px, 6vw, 31px);
 
-        border-bottom:
-          3px solid
-          currentColor;
+        width: clamp(20px, 6vw, 31px);
+        height: clamp(28px, 7.5vw, 38px);
 
-        font-size:
-          clamp(1.15rem, 6vw, 1.75rem);
+        border-bottom: 2px solid currentColor;
 
+        font-size: clamp(0.95rem, 5vw, 1.35rem);
         font-weight: 950;
-
         line-height: 1;
       }
 
       .hangman-letter.is-revealed {
-        color:
-          var(--hangman-success);
-
-        border-bottom-color:
-          var(--hangman-success);
+        color: var(--hangman-success);
+        border-bottom-color: var(--hangman-success);
       }
 
       .hangman-letter.is-missed {
-        color:
-          var(--hangman-danger);
+        color: var(--hangman-danger);
       }
 
       /* ========================================================
@@ -304,26 +275,24 @@ export default function initHangman(root, options = {}) {
 
       .hangman-status {
         display: flex;
-
         align-items: center;
         justify-content: center;
 
-        gap: 8px;
+        gap: 5px;
 
-        min-height: 28px;
+        min-height: 22px;
 
-        margin-bottom: 8px;
+        margin-bottom: 4px;
 
-        font-size: 0.82rem;
-
+        font-size: 0.7rem;
         font-weight: 800;
 
+        line-height: 1.2;
         text-align: center;
       }
 
       .hangman-status strong {
-        color:
-          var(--hangman-accent);
+        color: var(--hangman-accent);
       }
 
       /* ========================================================
@@ -333,40 +302,34 @@ export default function initHangman(root, options = {}) {
       .hangman-keyboard {
         display: grid;
 
-        grid-template-columns:
-          repeat(7, 1fr);
+        grid-template-columns: repeat(7, minmax(0, 1fr));
 
-        gap: 6px;
+        gap: 4px;
 
-        margin-top: 9px;
+        margin-top: 5px;
       }
 
       .hangman-key {
         appearance: none;
 
-        min-height: 42px;
+        width: 100%;
+        min-width: 0;
+        min-height: 34px;
 
-        padding: 0 3px;
+        padding: 0 2px;
 
-        border:
-          1px solid
-          rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 7px;
 
-        border-radius: 10px;
-
-        background:
-          rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.065);
 
         color: inherit;
 
         font: inherit;
-
-        font-size: 0.82rem;
-
+        font-size: clamp(0.68rem, 2.5vw, 0.76rem);
         font-weight: 950;
 
         cursor: pointer;
-
         touch-action: manipulation;
 
         transition:
@@ -376,12 +339,11 @@ export default function initHangman(root, options = {}) {
       }
 
       .hangman-key:active {
-        transform: scale(0.92);
+        transform: scale(0.91);
       }
 
       .hangman-key:hover:not(:disabled) {
-        background:
-          rgba(139,92,246,0.16);
+        background: rgba(139,92,246,0.15);
       }
 
       .hangman-key:disabled {
@@ -390,25 +352,15 @@ export default function initHangman(root, options = {}) {
       }
 
       .hangman-key.is-correct {
-        background:
-          rgba(34,197,94,0.18);
-
-        border-color:
-          rgba(34,197,94,0.30);
-
-        color:
-          var(--hangman-success);
+        background: rgba(34,197,94,0.17);
+        border-color: rgba(34,197,94,0.28);
+        color: var(--hangman-success);
       }
 
       .hangman-key.is-wrong {
-        background:
-          rgba(239,68,68,0.14);
-
-        border-color:
-          rgba(239,68,68,0.25);
-
-        color:
-          var(--hangman-danger);
+        background: rgba(239,68,68,0.13);
+        border-color: rgba(239,68,68,0.23);
+        color: var(--hangman-danger);
       }
 
       /* ========================================================
@@ -418,50 +370,44 @@ export default function initHangman(root, options = {}) {
       .hangman-actions {
         display: grid;
 
-        grid-template-columns:
-          repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        gap: 9px;
+        gap: 6px;
 
-        margin-top: 12px;
+        margin-top: 7px;
       }
 
       .hangman-action {
         appearance: none;
 
-        min-height: 46px;
+        min-height: 37px;
 
-        border-radius: 14px;
+        padding: 5px 8px;
 
-        border:
-          1px solid
-          rgba(139,92,246,0.24);
+        border-radius: 10px;
 
-        background:
-          rgba(139,92,246,0.09);
+        border: 1px solid rgba(139,92,246,0.21);
+
+        background: rgba(139,92,246,0.08);
 
         color: inherit;
 
         font: inherit;
-
+        font-size: 0.7rem;
         font-weight: 900;
 
         cursor: pointer;
-
         touch-action: manipulation;
       }
 
       .hangman-action.primary {
         border: 0;
 
-        background:
-          var(--hangman-accent);
-
+        background: var(--hangman-accent);
         color: #fff;
 
         box-shadow:
-          0 8px 22px
-          rgba(139,92,246,0.24);
+          0 5px 14px rgba(139,92,246,0.20);
       }
 
       .hangman-action:active {
@@ -480,22 +426,17 @@ export default function initHangman(root, options = {}) {
         z-index: 30;
 
         display: flex;
-
         align-items: center;
         justify-content: center;
 
-        padding: 18px;
+        padding: 10px;
 
-        border-radius: 24px;
+        border-radius: 18px;
 
-        background:
-          rgba(15,10,25,0.82);
+        background: rgba(15,10,25,0.82);
 
-        backdrop-filter:
-          blur(6px);
-
-        -webkit-backdrop-filter:
-          blur(6px);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
 
         opacity: 0;
         visibility: hidden;
@@ -511,110 +452,97 @@ export default function initHangman(root, options = {}) {
       }
 
       .hangman-overlay-card {
-        width: min(100%, 320px);
+        width: min(100%, 270px);
 
-        padding: 24px 18px;
+        padding: 18px 13px;
 
         text-align: center;
 
-        border-radius: 22px;
+        border-radius: 17px;
 
-        background:
-          rgba(255,255,255,0.09);
-
-        border:
-          1px solid
-          rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.085);
+        border: 1px solid rgba(255,255,255,0.13);
 
         color: #fff;
 
         box-shadow:
-          0 22px 60px
-          rgba(0,0,0,0.30);
+          0 18px 45px rgba(0,0,0,0.28);
       }
 
       .hangman-overlay-icon {
-        font-size: 3rem;
-
+        font-size: 2.35rem;
         line-height: 1;
 
-        margin-bottom: 9px;
+        margin-bottom: 6px;
       }
 
       .hangman-overlay-card h4 {
-        margin: 0 0 6px;
+        margin: 0 0 4px;
 
-        font-size: 1.6rem;
+        font-size: 1.3rem;
       }
 
       .hangman-overlay-card p {
-        margin: 0 0 15px;
+        margin: 0 0 10px;
 
-        font-size: 0.86rem;
-
+        font-size: 0.72rem;
         opacity: 0.72;
       }
 
       .hangman-overlay-stats {
         display: grid;
 
-        grid-template-columns:
-          repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        gap: 8px;
+        gap: 6px;
 
-        margin-bottom: 16px;
+        margin-bottom: 11px;
       }
 
       .hangman-overlay-stat {
-        padding: 9px;
+        padding: 7px;
 
-        border-radius: 12px;
+        border-radius: 9px;
 
-        background:
-          rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.065);
       }
 
       .hangman-overlay-stat span {
         display: block;
 
-        font-size: 0.59rem;
-
+        font-size: 0.5rem;
         font-weight: 800;
 
-        letter-spacing: 0.08em;
-
+        letter-spacing: 0.07em;
         text-transform: uppercase;
 
-        opacity: 0.58;
+        opacity: 0.55;
       }
 
       .hangman-overlay-stat strong {
         display: block;
 
-        margin-top: 3px;
+        margin-top: 2px;
 
-        font-size: 1.1rem;
+        font-size: 0.95rem;
       }
 
       .hangman-overlay-button {
         appearance: none;
 
+        min-height: 37px;
+
+        padding: 7px 19px;
+
         border: 0;
-
-        min-height: 44px;
-
-        padding: 10px 24px;
-
         border-radius: 999px;
 
-        background:
-          var(--hangman-accent);
+        background: var(--hangman-accent);
 
         color: #fff;
 
         font: inherit;
-
+        font-size: 0.72rem;
         font-weight: 900;
 
         cursor: pointer;
@@ -626,52 +554,77 @@ export default function initHangman(root, options = {}) {
 
       .hangman-footer {
         display: flex;
-
         justify-content: space-between;
 
-        gap: 10px;
+        gap: 7px;
 
-        margin-top: 10px;
+        margin-top: 6px;
 
-        font-size: 0.73rem;
+        font-size: 0.6rem;
+        line-height: 1.1;
 
-        opacity: 0.56;
+        opacity: 0.5;
       }
 
       .hangman-footer strong {
-        color:
-          var(--hangman-accent);
-
+        color: var(--hangman-accent);
         opacity: 1;
       }
 
       /* ========================================================
-         SMALL SCREENS
+         VERY SMALL SCREENS
          ======================================================== */
 
-      @media (max-width: 430px) {
+      @media (max-width: 380px) {
+        .hangman-screen {
+          padding-bottom: 8px;
+        }
+
         .hangman-card {
-          padding: 12px;
-          border-radius: 20px;
+          padding: 8px;
+          border-radius: 15px;
+        }
+
+        .hangman-header {
+          margin-bottom: 6px;
+        }
+
+        .hangman-score-box {
+          min-width: 52px;
+          padding: 4px 5px;
         }
 
         .hangman-drawing {
-          height: 180px;
+          height: 122px;
+          border-radius: 11px;
         }
 
         .hangman-svg {
-          height: 168px;
+          height: 115px;
+          width: 160px;
         }
 
         .hangman-keyboard {
-          gap: 5px;
+          gap: 3px;
         }
 
         .hangman-key {
-          min-height: 39px;
-          font-size: 0.76rem;
+          min-height: 31px;
+          border-radius: 6px;
+        }
+
+        .hangman-actions {
+          gap: 5px;
+        }
+
+        .hangman-action {
+          min-height: 34px;
         }
       }
+
+      /* ========================================================
+         REDUCED MOTION
+         ======================================================== */
 
       @media (prefers-reduced-motion: reduce) {
         .hangman-part,
@@ -705,10 +658,7 @@ export default function initHangman(root, options = {}) {
         <div class="hangman-badges">
 
           <div class="hangman-score-box">
-            <span class="hangman-score-label">
-              Score
-            </span>
-
+            <span class="hangman-score-label">Score</span>
             <strong
               class="hangman-score-value"
               data-score
@@ -716,10 +666,7 @@ export default function initHangman(root, options = {}) {
           </div>
 
           <div class="hangman-score-box">
-            <span class="hangman-score-label">
-              Streak
-            </span>
-
+            <span class="hangman-score-label">Streak</span>
             <strong
               class="hangman-score-value"
               data-streak
@@ -737,16 +684,12 @@ export default function initHangman(root, options = {}) {
           <span
             class="hangman-category"
             data-category
-          >
-            Category
-          </span>
+          >Category</span>
 
           <span
             class="hangman-difficulty"
             data-difficulty
-          >
-            Easy
-          </span>
+          >Easy</span>
 
         </div>
 
@@ -869,9 +812,7 @@ export default function initHangman(root, options = {}) {
             <div
               class="hangman-overlay-icon"
               data-overlay-icon
-            >
-              🎉
-            </div>
+            >🎉</div>
 
             <h4 data-overlay-title>
               You Win!
@@ -936,9 +877,7 @@ export default function initHangman(root, options = {}) {
     root.querySelector("[data-difficulty]");
 
   const drawingParts =
-    root.querySelectorAll(
-      "[data-part]"
-    );
+    root.querySelectorAll("[data-part]");
 
   const wordElement =
     root.querySelector("[data-word]");
@@ -1019,25 +958,11 @@ export default function initHangman(root, options = {}) {
   const ALPHABET =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  /*
-   * The local word payload is intentionally stored as encoded
-   * numeric data rather than as a large visible word array.
-   *
-   * Format:
-   *
-   * category|word|category|word...
-   *
-   * Each character is represented by its character code.
-   *
-   * The decoder below reconstructs the local word bank.
-   *
-   * The actual game remains completely offline.
-   */
+  /* ============================================================
+     WORD DATA
+     ============================================================ */
 
   const WORD_DATA = [
-    /*
-     * Animals
-     */
     "65,78,73,77,65,76,83",
     "69,76,69,80,72,65,78,84",
     "67,82,79,67,79,68,73,76,69",
@@ -1059,13 +984,10 @@ export default function initHangman(root, options = {}) {
     "70,76,65,77,73,78,71,79",
     "72,65,77,83,84,69,82",
 
-    /*
-     * Nature
-     */
     "78,65,84,85,82,69",
     "77,79,85,78,84,65,73,78",
     "82,65,73,78,66,79,87",
-    "84,72,85,78,68,69,82,83,84,79,82,77",
+    "84,72,85,78,68,69,82,83,84,79,77",
     "87,65,84,69,82,70,65,76,76",
     "79,67,69,65,78",
     "86,79,76,67,65,78,79",
@@ -1077,11 +999,8 @@ export default function initHangman(root, options = {}) {
     "87,73,76,68,70,76,79,87,69,82",
     "77,79,85,78,84,65,73,78",
     "87,73,76,68,76,73,70,69",
-    "84,72,85,78,68,69,82,83,84,79,82,77",
+    "84,72,85,78,68,69,82,83,84,79,77",
 
-    /*
-     * Places
-     */
     "65,73,82,80,79,82,84",
     "67,65,83,84,76,69",
     "77,79,85,78,84,65,73,78",
@@ -1103,9 +1022,6 @@ export default function initHangman(root, options = {}) {
     "66,65,82,67,69,76,79,78,65",
     "65,68,86,69,78,84,85,82,69",
 
-    /*
-     * Science
-     */
     "77,79,76,69,67,85,76,69",
     "65,84,79,77",
     "69,78,69,82,71,89",
@@ -1122,9 +1038,6 @@ export default function initHangman(root, options = {}) {
     "80,76,65,78,69,84,65,82,89",
     "69,67,79,76,79,71,89",
 
-    /*
-     * Food
-     */
     "80,73,90,90,65",
     "80,65,83,84,65",
     "66,85,82,71,69,82",
@@ -1142,9 +1055,6 @@ export default function initHangman(root, options = {}) {
     "80,79,84,65,84,79",
     "67,72,79,67,79,76,65,84,69",
 
-    /*
-     * Technology
-     */
     "67,79,77,80,85,84,69,82",
     "82,79,66,79,84,73,67,83",
     "83,77,65,82,84,80,72,79,78,69",
@@ -1160,9 +1070,6 @@ export default function initHangman(root, options = {}) {
     "83,69,82,86,69,82",
     "67,79,77,80,73,76,69,82",
 
-    /*
-     * Sports
-     */
     "70,79,79,84,66,65,76,76",
     "66,65,83,75,69,84,66,65,76,76",
     "86,79,76,76,69,89,66,65,76,76",
@@ -1180,9 +1087,6 @@ export default function initHangman(root, options = {}) {
     "83,75,65,84,69,66,79,65,82,68",
     "67,72,65,77,80,73,79,78,83,72,73,80",
 
-    /*
-     * Travel
-     */
     "86,65,67,65,84,73,79,78",
     "83,85,73,84,67,65,83,69",
     "72,79,84,69,76",
@@ -1200,9 +1104,6 @@ export default function initHangman(root, options = {}) {
     "80,65,83,83,80,79,82,84",
     "68,69,83,84,73,78,65,84,73,79,78",
 
-    /*
-     * Objects
-     */
     "66,65,67,75,80,65,67,69",
     "87,65,76,76,69,84",
     "87,65,76,76,69,84",
@@ -1220,9 +1121,6 @@ export default function initHangman(root, options = {}) {
     "66,65,67,75,80,65,67,75",
     "72,69,65,68,80,72,79,78,69",
 
-    /*
-     * Professions
-     */
     "68,79,67,84,79,82",
     "84,69,65,67,72,69,82",
     "69,78,71,73,78,69,69,82",
@@ -1238,9 +1136,6 @@ export default function initHangman(root, options = {}) {
     "77,65,78,65,71,69,82",
     "80,82,79,71,82,65,77,77,69,82",
 
-    /*
-     * General / harder words
-     */
     "65,68,86,69,78,84,85,82,69",
     "67,85,82,73,79,83,73,84,89",
     "73,77,65,71,73,78,65,84,73,79,78",
@@ -1276,9 +1171,7 @@ export default function initHangman(root, options = {}) {
     return encoded
       .split(",")
       .map((code) =>
-        String.fromCharCode(
-          Number(code)
-        )
+        String.fromCharCode(Number(code))
       )
       .join("")
       .toUpperCase();
@@ -1287,100 +1180,41 @@ export default function initHangman(root, options = {}) {
   function getDifficulty(word) {
     const length = word.length;
 
-    if (
-      length >= 8 &&
-      length <= 9
-    ) {
+    if (length >= 8 && length <= 9) {
       return "Easy";
     }
 
-    if (
-      length >= 10 &&
-      length <= 11
-    ) {
+    if (length >= 10 && length <= 11) {
       return "Medium";
     }
 
-    if (
-      length >= 12 
-    ) {
+    if (length >= 12) {
       return "Hard";
     }
 
     return null;
   }
 
-  /*
-   * Categories correspond to the groups above.
-   *
-   * We keep the category map separate from the encoded
-   * payload so the actual word strings remain local/encoded.
-   */
   const CATEGORY_RANGES = [
-    {
-      category: "Animals",
-      start: 0,
-      end: 20
-    },
-    {
-      category: "Nature",
-      start: 20,
-      end: 36
-    },
-    {
-      category: "Places",
-      start: 36,
-      end: 56
-    },
-    {
-      category: "Science",
-      start: 56,
-      end: 71
-    },
-    {
-      category: "Food",
-      start: 71,
-      end: 87
-    },
-    {
-      category: "Technology",
-      start: 87,
-      end: 100
-    },
-    {
-      category: "Sports",
-      start: 100,
-      end: 116
-    },
-    {
-      category: "Travel",
-      start: 116,
-      end: 132
-    },
-    {
-      category: "Objects",
-      start: 132,
-      end: 148
-    },
-    {
-      category: "Professions",
-      start: 148,
-      end: 162
-    },
-    {
-      category: "General",
-      start: 162,
-      end: WORD_DATA.length
-    }
+    { category: "Animals", start: 0, end: 20 },
+    { category: "Nature", start: 20, end: 36 },
+    { category: "Places", start: 36, end: 56 },
+    { category: "Science", start: 56, end: 71 },
+    { category: "Food", start: 71, end: 87 },
+    { category: "Technology", start: 87, end: 100 },
+    { category: "Sports", start: 100, end: 116 },
+    { category: "Travel", start: 116, end: 132 },
+    { category: "Objects", start: 132, end: 148 },
+    { category: "Professions", start: 148, end: 162 },
+    { category: "General", start: 162, end: WORD_DATA.length }
   ];
 
   function getCategory(index) {
-    const group =
-      CATEGORY_RANGES.find(
-        (entry) =>
-          index >= entry.start &&
-          index < entry.end
-      );
+    const group = CATEGORY_RANGES.find(
+      (entry) =>
+        index >= entry.start &&
+        index < entry.end
+    );
 
     return group
       ? group.category
@@ -1389,49 +1223,34 @@ export default function initHangman(root, options = {}) {
 
   const WORD_BANK =
     WORD_DATA
-      .map(
-        (encoded, index) => {
-          const word =
-            decodeWord(encoded);
+      .map((encoded, index) => {
+        const word = decodeWord(encoded);
 
-          return {
-            word,
-            category:
-              getCategory(index),
-            difficulty:
-              getDifficulty(word)
-          };
-        }
-      )
-      .filter(
-        (entry) =>
-          entry.difficulty
-      );
+        return {
+          word,
+          category: getCategory(index),
+          difficulty: getDifficulty(word)
+        };
+      })
+      .filter((entry) => entry.difficulty);
 
   /* ============================================================
      STATE
      ============================================================ */
 
   let currentWord = "";
-
   let currentCategory = "";
-
   let currentDifficulty = "";
 
-  let guessedLetters =
-    new Set();
+  let guessedLetters = new Set();
 
   let wrongGuesses = 0;
-
   let score = 0;
-
   let streak = 0;
 
-  let bestScore =
-    readBestScore();
+  let bestScore = readBestScore();
 
   let gameFinished = false;
-
   let destroyed = false;
 
   let lastWord = "";
@@ -1442,12 +1261,9 @@ export default function initHangman(root, options = {}) {
 
   function readBestScore() {
     try {
-      const value =
-        Number(
-          localStorage.getItem(
-            BEST_SCORE_KEY
-          )
-        );
+      const value = Number(
+        localStorage.getItem(BEST_SCORE_KEY)
+      );
 
       return Number.isFinite(value)
         ? Math.max(0, value)
@@ -1477,11 +1293,9 @@ export default function initHangman(root, options = {}) {
       return null;
     }
 
-    let candidates =
-      WORD_BANK.filter(
-        (entry) =>
-          entry.word !== lastWord
-      );
+    let candidates = WORD_BANK.filter(
+      (entry) => entry.word !== lastWord
+    );
 
     if (!candidates.length) {
       candidates = WORD_BANK;
@@ -1489,22 +1303,18 @@ export default function initHangman(root, options = {}) {
 
     return candidates[
       Math.floor(
-        Math.random() *
-        candidates.length
+        Math.random() * candidates.length
       )
     ];
   }
 
   /* ============================================================
-     UI HELPERS
+     UI
      ============================================================ */
 
   function updateScoreUI() {
-    scoreElement.textContent =
-      String(score);
-
-    streakElement.textContent =
-      String(streak);
+    scoreElement.textContent = String(score);
+    streakElement.textContent = String(streak);
 
     attemptsElement.textContent =
       String(
@@ -1515,13 +1325,11 @@ export default function initHangman(root, options = {}) {
       );
 
     if (appScore) {
-      appScore.textContent =
-        String(score);
+      appScore.textContent = String(score);
     }
 
     if (appBest) {
-      appBest.textContent =
-        String(bestScore);
+      appBest.textContent = String(bestScore);
     }
 
     if (appStatus) {
@@ -1533,30 +1341,24 @@ export default function initHangman(root, options = {}) {
     }
 
     if (appScoreLabel) {
-      appScoreLabel.textContent =
-        "Score";
+      appScoreLabel.textContent = "Score";
     }
 
     if (appBestLabel) {
-      appBestLabel.textContent =
-        "Best";
+      appBestLabel.textContent = "Best";
     }
 
     if (appStatusLabel) {
-      appStatusLabel.textContent =
-        "Lives";
+      appStatusLabel.textContent = "Lives";
     }
   }
 
   function setStatus(text) {
-    statusElement.textContent =
-      text;
+    statusElement.textContent = text;
   }
 
   function hideOverlay() {
-    overlay.classList.remove(
-      "is-visible"
-    );
+    overlay.classList.remove("is-visible");
   }
 
   /* ============================================================
@@ -1564,26 +1366,22 @@ export default function initHangman(root, options = {}) {
      ============================================================ */
 
   function renderDrawing() {
-    drawingParts.forEach(
-      (part, index) => {
-        part.classList.toggle(
-          "is-visible",
-          index <= wrongGuesses - 1
-        );
-      }
-    );
+    drawingParts.forEach((part, index) => {
+      part.classList.toggle(
+        "is-visible",
+        index <= wrongGuesses - 1
+      );
+    });
   }
 
   /* ============================================================
-     WORD RENDERING
+     WORD
      ============================================================ */
 
   function renderWord() {
     wordElement.replaceChildren();
 
-    for (
-      const letter of currentWord
-    ) {
+    for (const letter of currentWord) {
       const element =
         document.createElement("span");
 
@@ -1594,8 +1392,7 @@ export default function initHangman(root, options = {}) {
         guessedLetters.has(letter) ||
         gameFinished
       ) {
-        element.textContent =
-          letter;
+        element.textContent = letter;
 
         element.classList.add(
           "is-revealed"
@@ -1608,9 +1405,6 @@ export default function initHangman(root, options = {}) {
             "is-missed"
           );
         }
-      } else {
-        element.textContent =
-          "";
       }
 
       wordElement.append(element);
@@ -1624,34 +1418,23 @@ export default function initHangman(root, options = {}) {
   function renderKeyboard() {
     keyboardElement.replaceChildren();
 
-    for (
-      const letter of ALPHABET
-    ) {
+    for (const letter of ALPHABET) {
       const button =
         document.createElement("button");
 
       button.type = "button";
-
-      button.className =
-        "hangman-key";
-
-      button.textContent =
-        letter;
-
-      button.dataset.letter =
-        letter;
+      button.className = "hangman-key";
+      button.textContent = letter;
+      button.dataset.letter = letter;
 
       const guessed =
         guessedLetters.has(letter);
 
       button.disabled =
-        guessed ||
-        gameFinished;
+        guessed || gameFinished;
 
       if (guessed) {
-        if (
-          currentWord.includes(letter)
-        ) {
+        if (currentWord.includes(letter)) {
           button.classList.add(
             "is-correct"
           );
@@ -1667,23 +1450,17 @@ export default function initHangman(root, options = {}) {
         handleLetterClick
       );
 
-      keyboardElement.append(
-        button
-      );
+      keyboardElement.append(button);
     }
   }
 
   /* ============================================================
-     GAME CHECKS
+     GAME CHECK
      ============================================================ */
 
   function isWordComplete() {
-    for (
-      const letter of currentWord
-    ) {
-      if (
-        !guessedLetters.has(letter)
-      ) {
+    for (const letter of currentWord) {
+      if (!guessedLetters.has(letter)) {
         return false;
       }
     }
@@ -1696,16 +1473,12 @@ export default function initHangman(root, options = {}) {
      ============================================================ */
 
   function guessLetter(letter) {
-    if (
-      destroyed ||
-      gameFinished
-    ) {
+    if (destroyed || gameFinished) {
       return;
     }
 
     const normalized =
-      String(letter)
-        .toUpperCase();
+      String(letter).toUpperCase();
 
     if (
       !ALPHABET.includes(normalized) ||
@@ -1714,19 +1487,13 @@ export default function initHangman(root, options = {}) {
       return;
     }
 
-    guessedLetters.add(
-      normalized
-    );
+    guessedLetters.add(normalized);
 
-    if (
-      currentWord.includes(normalized)
-    ) {
+    if (currentWord.includes(normalized)) {
       playTone(560);
       vibrate(8);
 
-      setStatus(
-        "Nice! Keep going."
-      );
+      setStatus("Nice! Keep going.");
 
       renderWord();
       renderKeyboard();
@@ -1741,18 +1508,14 @@ export default function initHangman(root, options = {}) {
       playTone(180);
       vibrate(25);
 
-      if (
-        wrongGuesses >=
-        MAX_ATTEMPTS
-      ) {
+      if (wrongGuesses >= MAX_ATTEMPTS) {
         finishLoss();
         return;
       }
 
       setStatus(
         `Wrong letter — ${
-          MAX_ATTEMPTS -
-          wrongGuesses
+          MAX_ATTEMPTS - wrongGuesses
         } attempts left`
       );
 
@@ -1769,11 +1532,9 @@ export default function initHangman(root, options = {}) {
       return;
     }
 
-    const letter =
-      event.currentTarget
-        .dataset.letter;
-
-    guessLetter(letter);
+    guessLetter(
+      event.currentTarget.dataset.letter
+    );
   }
 
   /* ============================================================
@@ -1799,13 +1560,11 @@ export default function initHangman(root, options = {}) {
     const remainingBonus =
       Math.max(
         0,
-        MAX_ATTEMPTS -
-        wrongGuesses
+        MAX_ATTEMPTS - wrongGuesses
       );
 
     const wordBonus =
-      currentWord.length *
-      10;
+      currentWord.length * 10;
 
     score +=
       100 +
@@ -1813,9 +1572,7 @@ export default function initHangman(root, options = {}) {
       remainingBonus * 10 +
       difficultyBonus * 25;
 
-    if (
-      score > bestScore
-    ) {
+    if (score > bestScore) {
       bestScore = score;
       saveBestScore();
     }
@@ -1825,21 +1582,14 @@ export default function initHangman(root, options = {}) {
     );
 
     playTone(880);
-
-    vibrate([
-      25,
-      40,
-      55
-    ]);
+    vibrate([25, 40, 55]);
 
     renderWord();
     renderKeyboard();
     renderDrawing();
     updateScoreUI();
 
-    showOverlay(
-      "win"
-    );
+    showOverlay("win");
   }
 
   function finishLoss() {
@@ -1848,7 +1598,6 @@ export default function initHangman(root, options = {}) {
     }
 
     gameFinished = true;
-
     streak = 0;
 
     setStatus(
@@ -1863,9 +1612,7 @@ export default function initHangman(root, options = {}) {
     renderDrawing();
     updateScoreUI();
 
-    showOverlay(
-      "loss"
-    );
+    showOverlay("loss");
   }
 
   /* ============================================================
@@ -1874,34 +1621,21 @@ export default function initHangman(root, options = {}) {
 
   function showOverlay(type) {
     if (type === "win") {
-      overlayIcon.textContent =
-        "🎉";
-
-      overlayTitle.textContent =
-        "You Win!";
-
+      overlayIcon.textContent = "🎉";
+      overlayTitle.textContent = "You Win!";
       overlayMessage.textContent =
         `You found ${currentWord}!`;
     } else {
-      overlayIcon.textContent =
-        "💀";
-
-      overlayTitle.textContent =
-        "Game Over";
-
+      overlayIcon.textContent = "💀";
+      overlayTitle.textContent = "Game Over";
       overlayMessage.textContent =
         `The word was ${currentWord}.`;
     }
 
-    finalScore.textContent =
-      String(score);
+    finalScore.textContent = String(score);
+    finalStreak.textContent = String(streak);
 
-    finalStreak.textContent =
-      String(streak);
-
-    overlay.classList.add(
-      "is-visible"
-    );
+    overlay.classList.add("is-visible");
   }
 
   /* ============================================================
@@ -1913,34 +1647,22 @@ export default function initHangman(root, options = {}) {
       return;
     }
 
-    const entry =
-      getRandomWord();
+    const entry = getRandomWord();
 
     if (!entry) {
-      setStatus(
-        "No words available."
-      );
-
+      setStatus("No words available.");
       return;
     }
 
-    currentWord =
-      entry.word;
+    currentWord = entry.word;
+    currentCategory = entry.category;
+    currentDifficulty = entry.difficulty;
 
-    currentCategory =
-      entry.category;
+    lastWord = currentWord;
 
-    currentDifficulty =
-      entry.difficulty;
-
-    lastWord =
-      currentWord;
-
-    guessedLetters =
-      new Set();
+    guessedLetters = new Set();
 
     wrongGuesses = 0;
-
     gameFinished = false;
 
     categoryElement.textContent =
@@ -1955,9 +1677,7 @@ export default function initHangman(root, options = {}) {
     renderWord();
     renderKeyboard();
 
-    setStatus(
-      "Guess the word!"
-    );
+    setStatus("Guess the word!");
 
     updateScoreUI();
   }
@@ -1971,8 +1691,7 @@ export default function initHangman(root, options = {}) {
       return;
     }
 
-    const target =
-      event.target;
+    const target = event.target;
 
     if (
       target &&
@@ -1986,14 +1705,10 @@ export default function initHangman(root, options = {}) {
     }
 
     const key =
-      String(event.key)
-        .toUpperCase();
+      String(event.key).toUpperCase();
 
-    if (
-      ALPHABET.includes(key)
-    ) {
+    if (ALPHABET.includes(key)) {
       event.preventDefault();
-
       guessLetter(key);
     }
   }
@@ -2015,20 +1730,14 @@ export default function initHangman(root, options = {}) {
       return;
     }
 
-    /*
-     * Let app.js decide how the arcade navigation works.
-     *
-     * The mini-app itself does not own the global game router.
-     */
-    const event =
+    root.dispatchEvent(
       new CustomEvent(
         "miniArcade:backToArcade",
         {
           bubbles: true
         }
-      );
-
-    root.dispatchEvent(event);
+      )
+    );
   }
 
   /* ============================================================
@@ -2106,9 +1815,7 @@ export default function initHangman(root, options = {}) {
     guessedLetters.clear();
 
     currentWord = "";
-
     currentCategory = "";
-
     currentDifficulty = "";
 
     gameFinished = true;
