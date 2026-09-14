@@ -14,10 +14,14 @@ export default function initMemory(root) {
 
         width: 100%;
         max-width: 680px;
+        height: 100%;
+        max-height: 100%;
         margin: 0 auto;
-        padding: 6px 0 18px;
+        padding: clamp(3px, 1vh, 6px) 0 clamp(6px, 1.5vh, 12px);
         color: inherit;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
       .memory-screen *,
@@ -32,7 +36,7 @@ export default function initMemory(root) {
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        margin-bottom: 11px;
+        margin-bottom: clamp(5px, 1.2vh, 9px);
         min-width: 0;
       }
 
@@ -80,13 +84,13 @@ export default function initMemory(root) {
       .memory-score {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px;
-        margin-bottom: 9px;
+        gap: clamp(4px, 0.8vw, 6px);
+        margin-bottom: clamp(5px, 1vh, 8px);
       }
 
       .memory-score-unit {
         min-width: 0;
-        padding: 7px 5px;
+        padding: clamp(5px, 0.9vh, 7px) 5px;
         text-align: center;
         border-radius: 11px;
         background: color-mix(
@@ -123,7 +127,7 @@ export default function initMemory(root) {
         align-items: center;
         justify-content: flex-start;
         gap: 8px;
-        margin-bottom: 8px;
+        margin-bottom: clamp(4px, 0.9vh, 7px);
         min-width: 0;
       }
 
@@ -188,10 +192,10 @@ export default function initMemory(root) {
 
       /* MESSAGE */
       .memory-message {
-        min-height: 19px;
-        margin-bottom: 7px;
+        min-height: clamp(15px, 2.2vh, 19px);
+        margin-bottom: clamp(3px, 0.7vh, 6px);
         text-align: center;
-        font-size: 0.76rem;
+        font-size: clamp(0.68rem, 1.6vh, 0.76rem);
         font-weight: 700;
         line-height: 1.25;
         opacity: 0.72;
@@ -200,11 +204,17 @@ export default function initMemory(root) {
       /* BOARD */
       .memory-board-wrap {
         position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
         width: min(
           100%,
-          calc(100vw - 24px),
-          540px
+          calc(100vw - 20px),
+          410px,
+          max(180px, calc((100svh - 265px) * 0.96)),
+          max(180px, calc((100dvh - 265px) * 0.96))
         );
+        max-height: 100%;
+        aspect-ratio: 1;
         margin: 0 auto;
         max-width: 100%;
       }
@@ -214,13 +224,13 @@ export default function initMemory(root) {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         grid-template-rows: repeat(4, minmax(0, 1fr));
 
-        gap: clamp(5px, 1.5vw, 9px);
+        gap: clamp(4px, 1.2vw, 8px);
 
         width: 100%;
         aspect-ratio: 1 / 1;
-        padding: clamp(6px, 1.5vw, 9px);
+        padding: clamp(5px, 1.2vw, 8px);
 
-        border-radius: 19px;
+        border-radius: 17px;
         background: #211a2f;
         border: 2px solid rgba(244, 114, 182, 0.30);
 
@@ -240,8 +250,8 @@ export default function initMemory(root) {
       .memory-board.memory-board-hard {
         grid-template-columns: repeat(5, minmax(0, 1fr));
         grid-template-rows: repeat(4, minmax(0, 1fr));
-        gap: clamp(4px, 1.2vw, 7px);
-        padding: clamp(5px, 1.3vw, 8px);
+        gap: clamp(3px, 1vw, 6px);
+        padding: clamp(4px, 1vw, 7px);
         aspect-ratio: 5 / 4;
       }
 
@@ -392,7 +402,7 @@ export default function initMemory(root) {
 
       /* EMOJI */
       .memory-emoji {
-        font-size: clamp(1.65rem, 8vw, 3.7rem);
+        font-size: clamp(1.05rem, 4.2vh, 2.4rem);
         line-height: 1;
         filter:
           drop-shadow(
@@ -557,7 +567,7 @@ export default function initMemory(root) {
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        margin-top: 9px;
+        margin-top: clamp(4px, 1vh, 8px);
         min-width: 0;
       }
 
@@ -640,6 +650,8 @@ export default function initMemory(root) {
             calc(100vw - 16px),
             500px
           );
+          max-height: 100%;
+          aspect-ratio: 1;
         }
 
         .memory-board {
@@ -677,6 +689,8 @@ export default function initMemory(root) {
       @media (max-width: 350px) {
         .memory-board-wrap {
           width: calc(100vw - 12px);
+          max-height: 100%;
+          aspect-ratio: 1;
         }
 
         .memory-board {
@@ -711,6 +725,159 @@ export default function initMemory(root) {
           animation: none;
         }
       }
+
+      @media (max-height: 760px) {
+        .memory-screen {
+          padding-top: 2px;
+          padding-bottom: 5px;
+        }
+
+        .memory-header {
+          margin-bottom: 5px;
+        }
+
+        .memory-header h3 {
+          font-size: 1.25rem;
+        }
+
+        .memory-score {
+          margin-bottom: 5px;
+          gap: 4px;
+        }
+
+        .memory-score-unit {
+          padding: 4px 3px;
+        }
+
+        .memory-score-unit strong {
+          font-size: 0.9rem;
+        }
+
+        .memory-controls {
+          margin-bottom: 4px;
+        }
+
+        .memory-difficulty button {
+          min-height: 26px;
+          padding: 3px 7px;
+          font-size: 0.63rem;
+        }
+
+        .memory-message {
+          min-height: 15px;
+          margin-bottom: 3px;
+          font-size: 0.7rem;
+        }
+
+        .memory-board-wrap {
+          width: min(
+            100%,
+            calc(100vw - 16px),
+            440px,
+            max(170px, calc((100svh - 225px) * 0.96)),
+            max(170px, calc((100dvh - 225px) * 0.96))
+          );
+        }
+
+        .memory-board {
+          border-radius: 14px;
+          gap: 5px;
+          padding: 5px;
+        }
+
+        .memory-emoji {
+          font-size: clamp(1.1rem, 4.5vh, 2.2rem);
+        }
+
+        .memory-footer {
+          margin-top: 4px;
+        }
+
+        .memory-new-round {
+          min-height: 32px;
+          padding: 0 10px;
+          font-size: 0.72rem;
+        }
+      }
+
+      @media (max-height: 620px) {
+        .memory-screen {
+          padding-top: 1px;
+          padding-bottom: 3px;
+        }
+
+        .memory-header {
+          margin-bottom: 3px;
+        }
+
+        .memory-header h3 {
+          font-size: 1.1rem;
+        }
+
+        .memory-status {
+          padding: 3px 6px;
+          font-size: 0.64rem;
+        }
+
+        .memory-score {
+          margin-bottom: 3px;
+        }
+
+        .memory-score-unit {
+          padding: 3px 2px;
+        }
+
+        .memory-controls {
+          margin-bottom: 3px;
+        }
+
+        .memory-difficulty button {
+          min-height: 24px;
+          padding: 2px 6px;
+          font-size: 0.6rem;
+        }
+
+        .memory-message {
+          min-height: 13px;
+          margin-bottom: 2px;
+          font-size: 0.65rem;
+        }
+
+        .memory-board-wrap {
+          width: min(
+            100%,
+            calc(100vw - 14px),
+            360px,
+            max(150px, calc((100svh - 180px) * 0.96)),
+            max(150px, calc((100dvh - 180px) * 0.96))
+          );
+        }
+
+        .memory-board {
+          border-radius: 11px;
+          gap: 4px;
+          padding: 4px;
+        }
+
+        .memory-emoji {
+          font-size: clamp(0.95rem, 4vh, 1.8rem);
+        }
+
+        .memory-footer {
+          margin-top: 3px;
+        }
+
+        .memory-footer-message {
+          font-size: 0.6rem;
+        }
+
+        .memory-new-round {
+          min-height: 28px;
+          padding: 0 8px;
+          font-size: 0.66rem;
+        }
+      }
+
     `;
 
     document.head.appendChild(style);

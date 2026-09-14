@@ -22,9 +22,9 @@ export default function init2048MergeTiles(root, options = {}) {
         --merge2048-accent-strong: #d97706;
 
         width: 100%;
-        max-width: 560px;
+        max-width: 540px;
         margin: 0 auto;
-        padding: 4px 0 14px;
+        padding: clamp(2px, 0.8vh, 4px) 0 clamp(4px, 1.2vh, 10px);
 
         color: inherit;
         overflow: hidden;
@@ -48,7 +48,7 @@ export default function init2048MergeTiles(root, options = {}) {
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        margin-bottom: 9px;
+        margin-bottom: clamp(4px, 1vh, 8px);
         min-width: 0;
       }
 
@@ -58,7 +58,7 @@ export default function init2048MergeTiles(root, options = {}) {
 
       .merge2048-header h3 {
         margin: 1px 0 0;
-        font-size: clamp(1.3rem, 5vw, 1.7rem);
+        font-size: clamp(1.2rem, 4.5vw, 1.6rem);
         line-height: 1.05;
       }
 
@@ -108,14 +108,16 @@ export default function init2048MergeTiles(root, options = {}) {
 
         width: min(
           100%,
-          500px,
-          calc(100vw - 20px)
+          420px,
+          calc(100vw - 20px),
+          max(180px, calc((100svh - 315px) * 0.95)),
+          max(180px, calc((100dvh - 315px) * 0.95))
         );
 
         margin: 0 auto;
-        padding: 8px;
+        padding: clamp(5px, 1.2vh, 8px);
 
-        border-radius: 19px;
+        border-radius: clamp(12px, 2vh, 19px);
 
         background:
           linear-gradient(
@@ -357,12 +359,12 @@ export default function init2048MergeTiles(root, options = {}) {
          ======================================================== */
 
       .merge2048-message {
-        min-height: 19px;
-        margin: 7px 0 0;
+        min-height: clamp(15px, 2.2vh, 18px);
+        margin: clamp(3px, 0.6vh, 5px) 0 0;
 
         text-align: center;
 
-        font-size: 0.76rem;
+        font-size: clamp(0.66rem, 1.5vh, 0.74rem);
         font-weight: 750;
 
         opacity: 0.70;
@@ -375,21 +377,21 @@ export default function init2048MergeTiles(root, options = {}) {
       .merge2048-controls {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 6px;
+        gap: clamp(3px, 0.6vh, 5px);
 
         width: 100%;
-        margin-top: 7px;
+        margin-top: clamp(4px, 0.8vh, 6px);
       }
 
       .merge2048-control {
         appearance: none;
 
         min-width: 0;
-        min-height: 39px;
-        padding: 5px 3px;
+        min-height: clamp(26px, 3.8vh, 34px);
+        padding: clamp(3px, 0.6vh, 5px) 3px;
 
         border: 1px solid rgba(245,158,11,0.22);
-        border-radius: 10px;
+        border-radius: clamp(6px, 1.2vh, 10px);
 
         background:
           rgba(245,158,11,0.08);
@@ -397,7 +399,7 @@ export default function init2048MergeTiles(root, options = {}) {
         color: inherit;
 
         font: inherit;
-        font-size: 0.68rem;
+        font-size: clamp(0.62rem, 1.5vh, 0.7rem);
         font-weight: 900;
 
         cursor: pointer;
@@ -418,9 +420,9 @@ export default function init2048MergeTiles(root, options = {}) {
         appearance: none;
 
         width: 100%;
-        min-height: 40px;
-        margin-top: 7px;
-        padding: 7px 14px;
+        min-height: clamp(28px, 4vh, 36px);
+        margin-top: clamp(4px, 0.8vh, 6px);
+        padding: clamp(4px, 0.8vh, 6px) 14px;
 
         border: 0;
         border-radius: 999px;
@@ -431,7 +433,7 @@ export default function init2048MergeTiles(root, options = {}) {
         color: #fff;
 
         font: inherit;
-        font-size: 0.78rem;
+        font-size: clamp(0.7rem, 1.6vh, 0.76rem);
         font-weight: 900;
 
         cursor: pointer;
@@ -594,9 +596,9 @@ export default function init2048MergeTiles(root, options = {}) {
         justify-content: space-between;
         gap: 6px;
 
-        margin-top: 6px;
+        margin-top: clamp(3px, 0.6vh, 5px);
 
-        font-size: 0.65rem;
+        font-size: clamp(0.56rem, 1.3vh, 0.64rem);
         line-height: 1.2;
 
         opacity: 0.55;
@@ -615,6 +617,137 @@ export default function init2048MergeTiles(root, options = {}) {
           var(--merge2048-accent);
 
         opacity: 1;
+      }
+
+      @media (max-height: 760px) {
+        .merge2048-screen {
+          padding: 2px 0 4px;
+        }
+
+        .merge2048-header {
+          margin-bottom: 4px;
+        }
+
+        .merge2048-header h3 {
+          font-size: 1.15rem;
+        }
+
+        .merge2048-score-box {
+          min-width: 50px;
+          padding: 3px 5px;
+        }
+
+        .merge2048-game-wrap {
+          width: min(
+            100%,
+            380px,
+            calc(100vw - 16px),
+            max(170px, calc((100svh - 265px) * 0.95)),
+            max(170px, calc((100dvh - 265px) * 0.95))
+          );
+          padding: 6px;
+        }
+
+        .merge2048-message {
+          min-height: 14px;
+          margin-top: 3px;
+          font-size: 0.68rem;
+        }
+
+        .merge2048-controls {
+          margin-top: 3px;
+          gap: 4px;
+        }
+
+        .merge2048-control {
+          min-height: 28px;
+          font-size: 0.64rem;
+        }
+
+        .merge2048-new-game {
+          min-height: 30px;
+          margin-top: 4px;
+          font-size: 0.72rem;
+        }
+
+        .merge2048-footer {
+          margin-top: 3px;
+          font-size: 0.58rem;
+        }
+      }
+
+      @media (max-height: 620px) {
+        .merge2048-screen {
+          padding: 1px 0 2px;
+        }
+
+        .merge2048-header {
+          margin-bottom: 3px;
+        }
+
+        .merge2048-header h3 {
+          font-size: 1.05rem;
+        }
+
+        .merge2048-header .eyebrow {
+          display: none;
+        }
+
+        .merge2048-score-box {
+          min-width: 44px;
+          padding: 2px 4px;
+        }
+
+        .merge2048-score-label {
+          font-size: 0.44rem;
+        }
+
+        .merge2048-score-value {
+          font-size: 0.78rem;
+        }
+
+        .merge2048-game-wrap {
+          width: min(
+            100%,
+            300px,
+            calc(100vw - 14px),
+            max(150px, calc((100svh - 215px) * 0.95)),
+            max(150px, calc((100dvh - 215px) * 0.95))
+          );
+          padding: 5px;
+          border-radius: 12px;
+        }
+
+        .merge2048-board {
+          gap: 4px;
+          border-radius: 8px;
+        }
+
+        .merge2048-message {
+          min-height: 12px;
+          margin-top: 2px;
+          font-size: 0.62rem;
+        }
+
+        .merge2048-controls {
+          margin-top: 2px;
+          gap: 3px;
+        }
+
+        .merge2048-control {
+          min-height: 24px;
+          font-size: 0.58rem;
+        }
+
+        .merge2048-new-game {
+          min-height: 26px;
+          margin-top: 3px;
+          font-size: 0.68rem;
+        }
+
+        .merge2048-footer {
+          display: none;
+        }
       }
 
       /* ========================================================
@@ -1776,6 +1909,18 @@ export default function init2048MergeTiles(root, options = {}) {
     startGame
   );
 
+  function handleResize() {
+    if (destroyed) {
+      return;
+    }
+    renderTiles(false);
+  }
+
+  window.addEventListener(
+    "resize",
+    handleResize
+  );
+
   window.addEventListener(
     "keydown",
     handleKeyDown
@@ -1804,6 +1949,11 @@ export default function init2048MergeTiles(root, options = {}) {
       clearTimeout(animationTimer);
       animationTimer = null;
     }
+
+    window.removeEventListener(
+      "resize",
+      handleResize
+    );
 
     window.removeEventListener(
       "keydown",

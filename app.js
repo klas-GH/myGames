@@ -529,11 +529,11 @@ console.log("APP FILE LOADED");
       dom.gameGrid.append(card);
     });
 
-    dom.sessionStat.textContent =
-      "Backbone ready";
+dom.sessionStat.textContent =
+        "Have a fun break!";
 
-    dom.overallBest.textContent =
-      "0";
+dom.overallBest.textContent =
+        "no limits!";
   };
 
   /* ============================================================

@@ -25,15 +25,19 @@ export default function initHangman(root, options = {}) {
         --hangman-danger: #ef4444;
 
         width: 100%;
-        max-width: 560px;
+        max-width: 540px;
+        height: 100%;
+        max-height: 100%;
         margin: 0 auto;
-        padding: 4px 0 12px;
+        padding: clamp(2px, 0.8vh, 4px) 0 clamp(4px, 1.2vh, 8px);
 
         color: inherit;
 
         user-select: none;
         -webkit-user-select: none;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
       .hangman-screen *,
@@ -52,7 +56,7 @@ export default function initHangman(root, options = {}) {
         justify-content: space-between;
         gap: 8px;
 
-        margin-bottom: 8px;
+        margin-bottom: clamp(3px, 0.7vh, 6px);
       }
 
       .hangman-header h3 {
@@ -113,11 +117,14 @@ export default function initHangman(root, options = {}) {
       .hangman-card {
         position: relative;
 
+        flex: 1 1 auto;
+        min-height: 0;
+
         width: 100%;
 
-        padding: 10px;
+        padding: clamp(6px, 1.2vh, 10px);
 
-        border-radius: 18px;
+        border-radius: clamp(12px, 2vh, 18px);
 
         background:
           linear-gradient(
@@ -130,6 +137,9 @@ export default function initHangman(root, options = {}) {
 
         box-shadow:
           0 12px 32px rgba(0,0,0,0.13);
+
+        display: flex;
+        flex-direction: column;
       }
 
       /* ========================================================
@@ -143,7 +153,7 @@ export default function initHangman(root, options = {}) {
 
         gap: 7px;
 
-        margin-bottom: 7px;
+        margin-bottom: clamp(2px, 0.5vh, 4px);
       }
 
       .hangman-category {
@@ -184,11 +194,11 @@ export default function initHangman(root, options = {}) {
         justify-content: center;
 
         width: 100%;
-        height: clamp(130px, 31vw, 160px);
+        height: clamp(90px, 20vh, 160px);
 
-        margin-bottom: 2px;
+        margin-bottom: clamp(1px, 0.4vh, 2px);
 
-        border-radius: 13px;
+        border-radius: clamp(8px, 1.5vh, 13px);
 
         background: rgba(0,0,0,0.065);
 
@@ -196,8 +206,9 @@ export default function initHangman(root, options = {}) {
       }
 
       .hangman-svg {
-        width: min(185px, 62vw);
-        height: clamp(125px, 29vw, 150px);
+        width: auto;
+        max-width: 100%;
+        height: clamp(70px, 15.5vh, 125px);
 
         overflow: visible;
       }
@@ -234,9 +245,9 @@ export default function initHangman(root, options = {}) {
 
         gap: 4px;
 
-        min-height: 43px;
+        min-height: clamp(28px, 4.5vh, 38px);
 
-        margin: 5px 0 5px;
+        margin: clamp(2px, 0.5vh, 4px) 0;
         padding: 2px;
 
         max-width: 100%;
@@ -248,14 +259,14 @@ export default function initHangman(root, options = {}) {
         align-items: center;
         justify-content: center;
 
-        flex: 0 0 clamp(20px, 6vw, 31px);
+        flex: 0 0 clamp(18px, 4vw, 26px);
 
-        width: clamp(20px, 6vw, 31px);
-        height: clamp(28px, 7.5vw, 38px);
+        width: clamp(18px, 4vw, 26px);
+        height: clamp(22px, 3.8vh, 30px);
 
         border-bottom: 2px solid currentColor;
 
-        font-size: clamp(0.95rem, 5vw, 1.35rem);
+        font-size: clamp(0.85rem, 2.8vh, 1.15rem);
         font-weight: 950;
         line-height: 1;
       }
@@ -280,11 +291,11 @@ export default function initHangman(root, options = {}) {
 
         gap: 5px;
 
-        min-height: 22px;
+        min-height: clamp(15px, 2.2vh, 19px);
 
-        margin-bottom: 4px;
+        margin-bottom: clamp(2px, 0.5vh, 3px);
 
-        font-size: 0.7rem;
+        font-size: clamp(0.64rem, 1.5vh, 0.7rem);
         font-weight: 800;
 
         line-height: 1.2;
@@ -304,9 +315,13 @@ export default function initHangman(root, options = {}) {
 
         grid-template-columns: repeat(7, minmax(0, 1fr));
 
-        gap: 4px;
+        gap: clamp(2px, 0.5vh, 4px);
 
-        margin-top: 5px;
+        margin-top: clamp(3px, 0.6vh, 5px);
+
+        max-height: 42vh;
+        overflow-y: auto;
+        align-content: start;
       }
 
       .hangman-key {
@@ -314,19 +329,19 @@ export default function initHangman(root, options = {}) {
 
         width: 100%;
         min-width: 0;
-        min-height: 34px;
+        min-height: clamp(24px, 3.8vh, 31px);
 
         padding: 0 2px;
 
         border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 7px;
+        border-radius: clamp(4px, 1vh, 7px);
 
         background: rgba(255,255,255,0.065);
 
         color: inherit;
 
         font: inherit;
-        font-size: clamp(0.68rem, 2.5vw, 0.76rem);
+        font-size: clamp(0.64rem, 1.6vh, 0.74rem);
         font-weight: 950;
 
         cursor: pointer;
@@ -372,19 +387,19 @@ export default function initHangman(root, options = {}) {
 
         grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        gap: 6px;
+        gap: clamp(4px, 0.8vh, 6px);
 
-        margin-top: 7px;
+        margin-top: clamp(4px, 0.8vh, 6px);
       }
 
       .hangman-action {
         appearance: none;
 
-        min-height: 37px;
+        min-height: clamp(28px, 4vh, 34px);
 
-        padding: 5px 8px;
+        padding: clamp(3px, 0.6vh, 5px) 8px;
 
-        border-radius: 10px;
+        border-radius: clamp(7px, 1.2vh, 10px);
 
         border: 1px solid rgba(139,92,246,0.21);
 
@@ -393,7 +408,7 @@ export default function initHangman(root, options = {}) {
         color: inherit;
 
         font: inherit;
-        font-size: 0.7rem;
+        font-size: clamp(0.65rem, 1.5vh, 0.72rem);
         font-weight: 900;
 
         cursor: pointer;
@@ -574,6 +589,173 @@ export default function initHangman(root, options = {}) {
       .hangman-footer strong {
         color: var(--hangman-accent);
         opacity: 1;
+      }
+
+      @media (max-height: 760px) {
+        .hangman-screen {
+          padding: 2px 0 4px;
+        }
+
+        .hangman-header {
+          margin-bottom: 4px;
+        }
+
+        .hangman-header h3 {
+          font-size: 1.15rem;
+        }
+
+        .hangman-score-box {
+          min-width: 50px;
+          padding: 3px 5px;
+        }
+
+        .hangman-card {
+          padding: 7px;
+          border-radius: 13px;
+        }
+
+        .hangman-info {
+          margin-bottom: 3px;
+        }
+
+        .hangman-drawing {
+          height: clamp(80px, 15vh, 110px);
+        }
+
+        .hangman-svg {
+          height: clamp(76px, 14vh, 104px);
+        }
+
+        .hangman-word {
+          min-height: 28px;
+          margin: 2px 0;
+        }
+
+        .hangman-letter {
+          height: 24px;
+          font-size: 0.92rem;
+        }
+
+        .hangman-status {
+          min-height: 15px;
+          margin-bottom: 2px;
+          font-size: 0.65rem;
+        }
+
+        .hangman-keyboard {
+          margin-top: 3px;
+          gap: 3px;
+        }
+
+        .hangman-key {
+          min-height: 26px;
+          font-size: 0.66rem;
+        }
+
+        .hangman-actions {
+          margin-top: 4px;
+        }
+
+        .hangman-action {
+          min-height: 29px;
+          font-size: 0.66rem;
+        }
+
+        .hangman-footer {
+          margin-top: 3px;
+          font-size: 0.55rem;
+        }
+      }
+
+      @media (max-height: 620px) {
+        .hangman-screen {
+          padding: 1px 0 2px;
+        }
+
+        .hangman-header {
+          margin-bottom: 3px;
+        }
+
+        .hangman-header h3 {
+          font-size: 1.05rem;
+        }
+
+        .hangman-header .eyebrow {
+          display: none;
+        }
+
+        .hangman-score-box {
+          min-width: 44px;
+          padding: 2px 4px;
+        }
+
+        .hangman-score-label {
+          font-size: 0.44rem;
+        }
+
+        .hangman-score-value {
+          font-size: 0.78rem;
+        }
+
+        .hangman-card {
+          padding: 5px;
+          border-radius: 10px;
+        }
+
+        .hangman-info {
+          margin-bottom: 2px;
+        }
+
+        .hangman-drawing {
+          height: 68px;
+        }
+
+        .hangman-svg {
+          height: 64px;
+        }
+
+        .hangman-word {
+          min-height: 24px;
+          margin: 1px 0;
+        }
+
+        .hangman-letter {
+          height: 20px;
+          width: 20px;
+          flex-basis: 20px;
+          font-size: 0.8rem;
+        }
+
+        .hangman-status {
+          min-height: 13px;
+          margin-bottom: 1px;
+          font-size: 0.6rem;
+        }
+
+        .hangman-keyboard {
+          margin-top: 2px;
+          gap: 2px;
+        }
+
+        .hangman-key {
+          min-height: 23px;
+          font-size: 0.62rem;
+          border-radius: 4px;
+        }
+
+        .hangman-actions {
+          margin-top: 3px;
+          gap: 4px;
+        }
+
+        .hangman-action {
+          min-height: 26px;
+          font-size: 0.62rem;
+        }
+
+        .hangman-footer {
+          display: none;
+        }
       }
 
       /* ========================================================

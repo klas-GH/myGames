@@ -15,6 +15,8 @@ export default function initHigherLower(root) {
 
         width: 100%;
         max-width: 680px;
+        height: 100%;
+        max-height: 100%;
         margin: 0 auto;
         padding: 6px 0 12px;
         box-sizing: border-box;
@@ -22,6 +24,8 @@ export default function initHigherLower(root) {
         /* Prevent accidental horizontal overflow */
         min-width: 0;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
       .hl7-game *,
@@ -39,7 +43,7 @@ export default function initHigherLower(root) {
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 13px;
+        margin-bottom: 8px;
         min-width: 0;
       }
 
@@ -93,7 +97,7 @@ export default function initHigherLower(root) {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
       }
 
       .hl7-score-box {
@@ -186,6 +190,7 @@ export default function initHigherLower(root) {
       */
 
       .hl7-card-stage {
+        flex: 1 1 auto;
         min-height: 0;
 
         display: grid;
@@ -196,7 +201,7 @@ export default function initHigherLower(root) {
         perspective: 900px;
 
         /* Never let the stage create a huge fixed vertical area */
-        overflow: visible;
+        overflow: hidden;
       }
 
       .hl7-card {
@@ -210,11 +215,11 @@ export default function initHigherLower(root) {
          * - never below 210px
          * - never above 285px
          */
-        height: clamp(
-          210px,
-          31vh,
-          285px
-        );
+height: clamp(
+           225px,
+           33vh,
+           305px
+         );
 
         width: auto;
         aspect-ratio: 0.69;
@@ -517,7 +522,7 @@ export default function initHigherLower(root) {
 
         gap: 10px;
 
-        margin-top: 12px;
+        margin-top: 8px;
 
         min-width: 0;
       }
@@ -640,9 +645,9 @@ export default function initHigherLower(root) {
 
         .hl7-card {
           height: clamp(
-            190px,
-            31vh,
-            255px
+            205px,
+            32vh,
+            275px
           );
         }
 
@@ -786,9 +791,9 @@ export default function initHigherLower(root) {
       @media (min-width: 800px) and (min-height: 761px) {
         .hl7-card {
           height: clamp(
-            230px,
-            31vh,
-            285px
+            250px,
+            34vh,
+            320px
           );
         }
 

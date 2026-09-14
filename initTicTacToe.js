@@ -9,6 +9,112 @@ export function initTicTacToe({
 }) {
   console.log("TTT: module initialized");
 
+  const styleId = "tictactoe-local-styles";
+
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      .ttt-screen[data-game="tictactoe"] {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+        padding: clamp(8px, 1.8vh, 16px);
+        gap: clamp(8px, 1.5vh, 14px);
+        box-sizing: border-box;
+      }
+      .ttt-screen[data-game="tictactoe"] .ttt-header {
+        margin-bottom: 0;
+      }
+      .ttt-screen[data-game="tictactoe"] .ttt-board {
+        width: min(
+          100%,
+          380px,
+          max(180px, calc((100svh - 275px) * 0.95)),
+          max(180px, calc((100dvh - 275px) * 0.95))
+        );
+        aspect-ratio: 1 / 1;
+        gap: clamp(6px, 1.2vh, 9px);
+        margin: 0 auto;
+      }
+      .ttt-screen[data-game="tictactoe"] .ttt-cell {
+        aspect-ratio: 1;
+        font-size: clamp(1.8rem, 6vh, 3.2rem);
+        border-radius: clamp(10px, 2vh, 18px);
+      }
+      .ttt-screen[data-game="tictactoe"] .ttt-footer {
+        margin-top: auto;
+      }
+      @media (max-height: 760px) {
+        .ttt-screen[data-game="tictactoe"] {
+          padding: 8px 12px;
+          gap: 7px;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-header h3 {
+          font-size: 1.15rem;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-status {
+          min-height: 34px;
+          padding: 4px 8px;
+          font-size: 0.72rem;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-board {
+          width: min(
+            100%,
+            340px,
+            max(170px, calc((100svh - 225px) * 0.95)),
+            max(170px, calc((100dvh - 225px) * 0.95))
+          );
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-cell {
+          font-size: clamp(1.6rem, 5vh, 2.6rem);
+          border-radius: 13px;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-new-round {
+          min-height: 34px;
+          padding: 0 10px;
+          font-size: 0.72rem;
+        }
+      }
+      @media (max-height: 620px) {
+        .ttt-screen[data-game="tictactoe"] {
+          padding: 6px 10px;
+          gap: 5px;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-header h3 {
+          font-size: 1.05rem;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-status {
+          min-height: 30px;
+          padding: 3px 6px;
+          font-size: 0.65rem;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-board {
+          width: min(
+            100%,
+            280px,
+            max(150px, calc((100svh - 175px) * 0.95)),
+            max(150px, calc((100dvh - 175px) * 0.95))
+          );
+          gap: 5px;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-cell {
+          font-size: clamp(1.3rem, 4.5vh, 2rem);
+          border-radius: 9px;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-footer {
+          font-size: 0.6rem;
+        }
+        .ttt-screen[data-game="tictactoe"] .ttt-new-round {
+          min-height: 28px;
+          padding: 0 8px;
+          font-size: 0.66rem;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   /* ============================================================
      TIC-TAC-TOE
      ============================================================ */
@@ -313,6 +419,8 @@ export function initTicTacToe({
 
     screen.className =
       "ttt-screen";
+    screen.dataset.game =
+      "tictactoe";
 
     const statusText =
       game.gameOver

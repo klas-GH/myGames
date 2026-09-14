@@ -20,6 +20,8 @@ export default function initBrickBreaker(root, options = {}) {
         width:100%;
         max-width:760px;
         min-width:0;
+        height:100%;
+        max-height:100%;
         margin:0 auto;
         padding:clamp(3px,1vh,8px) 0
           calc(10px + env(safe-area-inset-bottom,0px));
@@ -27,6 +29,8 @@ export default function initBrickBreaker(root, options = {}) {
         user-select:none;
         -webkit-user-select:none;
         overflow:hidden;
+        display:flex;
+        flex-direction:column;
       }
 
       .brick-breaker-screen *,
@@ -41,7 +45,7 @@ export default function initBrickBreaker(root, options = {}) {
         justify-content:space-between;
         gap:12px;
         min-width:0;
-        margin-bottom:12px;
+        margin-bottom:8px;
       }
 
       .brick-header > div:first-child {
@@ -79,10 +83,12 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-game-wrap {
         position:relative;
+        flex:1 1 auto;
+        min-height:0;
         width:min(100%,620px);
         height:min(
-          48svh,
-          calc(100svh - 230px)
+          58svh,
+          calc(100svh - 195px)
         );
         aspect-ratio:360 / 550;
         margin:0 auto;
@@ -224,7 +230,7 @@ export default function initBrickBreaker(root, options = {}) {
 
       .brick-message {
         min-height:21px;
-        margin:8px 0 0;
+        margin:5px 0 0;
         padding:0 4px;
         text-align:center;
         font-size:.82rem;
@@ -281,10 +287,9 @@ export default function initBrickBreaker(root, options = {}) {
 
       @media (max-height:720px) {
         .brick-game-wrap {
-          width:min(
-            100%,
-            620px,
-            calc((100svh - 220px) * 360 / 550)
+          height:min(
+            58svh,
+            calc(100svh - 175px)
           );
         }
 
@@ -316,10 +321,9 @@ export default function initBrickBreaker(root, options = {}) {
         }
 
         .brick-game-wrap {
-          width:min(
-            100%,
-            620px,
-            calc((100svh - 190px) * 360 / 550)
+          height:min(
+            58svh,
+            calc(100svh - 150px)
           );
         }
 
