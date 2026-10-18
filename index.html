@@ -124,9 +124,64 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <aside id="installBanner" class="install-banner" aria-label="Install Mini Arcade" hidden>
+    <div>
+      <strong>Install Mini Arcade</strong>
+      <p>Add the arcade to your device for quick, offline play.</p>
+    </div>
+    <div class="install-actions">
+      <button id="installLater" class="button button-quiet" type="button">Not now</button>
+      <button id="installBtn" class="button button-primary" type="button">Install</button>
+    </div>
+  </aside>
     <script type="module" src="./app.js"></script>
 
     <script>
+      (() => {
+        const banner = document.getElementById("installBanner");
+        const installButton = document.getElementById("installBtn");
+        const laterButton = document.getElementById("installLater");
+        const storageKey = "myGames.installBannerDismissed";
+        let deferredPrompt = null;
+        let dismissed = false;
+
+        try { dismissed = localStorage.getItem(storageKey) === "1"; } catch {}
+
+        const isStandalone = () =>
+          window.matchMedia?.("(display-mode: standalone)").matches ||
+          navigator.standalone === true;
+        const hideBanner = () => { banner.hidden = true; };
+        const showBanner = () => {
+          banner.hidden = dismissed || isStandalone();
+        };
+        const dismissBanner = () => {
+          dismissed = true;
+          hideBanner();
+          try { localStorage.setItem(storageKey, "1"); } catch {}
+        };
+
+        installButton.addEventListener("click", () => {
+          if (!deferredPrompt) return;
+          const prompt = deferredPrompt;
+          deferredPrompt = null;
+          Promise.resolve(prompt.prompt()).catch(error => console.error("PWA install prompt failed:", error));
+          prompt.userChoice?.catch(error => console.error("PWA install choice failed:", error));
+          hideBanner();
+        });
+        laterButton.addEventListener("click", dismissBanner);
+
+        window.addEventListener("beforeinstallprompt", event => {
+          event.preventDefault();
+          deferredPrompt = event;
+          showBanner();
+        });
+        window.addEventListener("appinstalled", () => {
+          deferredPrompt = null;
+          hideBanner();
+        });
+        if (isStandalone()) hideBanner();
+      })();
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("./sw.js");
