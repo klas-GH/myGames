@@ -141,11 +141,8 @@
         const banner = document.getElementById("installBanner");
         const installButton = document.getElementById("installBtn");
         const laterButton = document.getElementById("installLater");
-        const storageKey = "myGames.installBannerDismissed";
         let deferredPrompt = null;
         let dismissed = false;
-
-        try { dismissed = localStorage.getItem(storageKey) === "1"; } catch {}
 
         const isStandalone = () =>
           window.matchMedia?.("(display-mode: standalone)").matches ||
@@ -157,11 +154,13 @@
         const dismissBanner = () => {
           dismissed = true;
           hideBanner();
-          try { localStorage.setItem(storageKey, "1"); } catch {}
         };
 
         installButton.addEventListener("click", () => {
-          if (!deferredPrompt) return;
+          if (!deferredPrompt) {
+            window.alert("Use the install icon near the address bar or choose your browser menu's app-install option. On iPhone or iPad, use Share > Add to Home Screen.");
+            return;
+          }
           const prompt = deferredPrompt;
           deferredPrompt = null;
           Promise.resolve(prompt.prompt()).catch(error => console.error("PWA install prompt failed:", error));
@@ -179,6 +178,7 @@
           deferredPrompt = null;
           hideBanner();
         });
+        showBanner();
         if (isStandalone()) hideBanner();
       })();
 
