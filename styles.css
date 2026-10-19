@@ -594,6 +594,7 @@ h3 {
   flex: 0 0 auto;
   min-width: 0;
   min-height: 0;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,6 +604,18 @@ h3 {
   font-size: 0.72rem;
   font-weight: 700;
   text-align: center;
+}
+
+.app-version {
+  position: absolute;
+  left: 14px;
+  bottom: 8px;
+  color: var(--text-faint);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .game-nav {

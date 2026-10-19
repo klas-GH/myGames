@@ -516,6 +516,11 @@ export default function initBrickBreaker(root, options = {}) {
 
   const LEVEL_BONUS = 50;
 
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const LOW_PERF = isMobile;
+
+  console.log("LOW_PERF:", LOW_PERF);
+
   /* ============================================================
      STATE
      ============================================================ */
@@ -627,7 +632,7 @@ export default function initBrickBreaker(root, options = {}) {
 
     const width = Math.max(1, rect.width || W);
     const height = Math.max(1, rect.height || width * H / W);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, LOW_PERF ? 1.5 : 2);
 
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -838,20 +843,22 @@ export default function initBrickBreaker(root, options = {}) {
 
     ctx.restore();
 
-    const glow = ctx.createRadialGradient(
-      W / 2,
-      70,
-      0,
-      W / 2,
-      70,
-      230
-    );
+    if (!LOW_PERF) {
+      const glow = ctx.createRadialGradient(
+        W / 2,
+        70,
+        0,
+        W / 2,
+        70,
+        230
+      );
 
-    glow.addColorStop(0, "rgba(251,113,133,.12)");
-    glow.addColorStop(1, "rgba(251,113,133,0)");
+      glow.addColorStop(0, "rgba(251,113,133,.12)");
+      glow.addColorStop(1, "rgba(251,113,133,0)");
 
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, 300);
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, 300);
+    }
   }
 
   function drawBricks() {
@@ -862,7 +869,7 @@ export default function initBrickBreaker(root, options = {}) {
         ctx.save();
 
         ctx.shadowColor = brick.glow;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = LOW_PERF ? 0 : 8;
 
         roundedRectPath(
           ctx,
@@ -918,7 +925,11 @@ export default function initBrickBreaker(root, options = {}) {
       ? "#ffffff"
       : "rgba(251,113,133,.70)";
 
-    ctx.shadowBlur = flash ? 22 : 14;
+    ctx.shadowBlur = LOW_PERF
+      ? 0
+      : flash
+        ? 22
+        : 14;
 
     const gradient = ctx.createLinearGradient(
       paddle.x,
@@ -964,22 +975,26 @@ export default function initBrickBreaker(root, options = {}) {
     ctx.save();
 
     ctx.shadowColor = "#fda4af";
-    ctx.shadowBlur = 16;
+    ctx.shadowBlur = LOW_PERF ? 0 : 16;
 
-    const gradient = ctx.createRadialGradient(
-      ball.x - ball.radius * .35,
-      ball.y - ball.radius * .4,
-      ball.radius * .12,
-      ball.x,
-      ball.y,
-      ball.radius
-    );
+    if (LOW_PERF) {
+      ctx.fillStyle = "#fb7185";
+    } else {
+      const gradient = ctx.createRadialGradient(
+        ball.x - ball.radius * .35,
+        ball.y - ball.radius * .4,
+        ball.radius * .12,
+        ball.x,
+        ball.y,
+        ball.radius
+      );
 
-    gradient.addColorStop(0, "#ffffff");
-    gradient.addColorStop(.35, "#ffe4e6");
-    gradient.addColorStop(1, "#fb7185");
+      gradient.addColorStop(0, "#ffffff");
+      gradient.addColorStop(.35, "#ffe4e6");
+      gradient.addColorStop(1, "#fb7185");
 
-    ctx.fillStyle = gradient;
+      ctx.fillStyle = gradient;
+    }
 
     ctx.beginPath();
     ctx.arc(
@@ -1011,7 +1026,9 @@ export default function initBrickBreaker(root, options = {}) {
     if (gameOver) return;
 
     const alpha =
-      .50 + Math.sin(performance.now() / 320) * .15;
+      LOW_PERF
+        ? 1
+        : .50 + Math.sin(performance.now() / 320) * .15;
 
     ctx.save();
 
